@@ -6,13 +6,13 @@ logging.basicConfig(
     level=logging.INFO,
     format="{asctime} {levelname:<8} {message}",
     style='{',
-    filename='gust/core/data/logs/test.log',
+    filename='core/data/logs/test.log',
     filemode='a'
 )
 
 class Gust_Log:
 
-    def Format_Log_Message(Message, Connection):
+    def Format_Log_Message(Message, Connection, User):
         
         if Connection is None:
             connection_details = "UNCONNECTED"
@@ -21,13 +21,15 @@ class Gust_Log:
         else: 
             connection_details = str(Connection.getpeername())
 
+        if User is None:
+            User = "Unknown User"
 
-        formated_mesage =  "[ " + connection_details +  " ] : " + Message
+        formated_mesage =  "[ " + connection_details +  " ] [ "+ User +" ] : " + Message
        
         return formated_mesage
 
-    def Authentication_Log(Code, Message, Connection):
-        formated_mesage = Gust_Log.Format_Log_Message(Message, Connection)
+    def Authentication_Log(Code, Message, Connection, User):
+        formated_mesage = Gust_Log.Format_Log_Message(Message, Connection, User)
 
         match Code:
             case 200:   #Successfull authentication
@@ -45,8 +47,8 @@ class Gust_Log:
             case _:
                 logging.error(formated_mesage)
 
-    def File_Log(Code, Message, Connection):
-        formated_mesage = Gust_Log.Format_Log_Message(Message, Connection)
+    def File_Log(Code, Message, Connection, User):
+        formated_mesage = Gust_Log.Format_Log_Message(Message, Connection, User)
 
         match Code:
             case 404:   #file not found
@@ -55,8 +57,8 @@ class Gust_Log:
             case _:
                 logging.error(formated_mesage)
 
-    def System_Log(Code, Message, Connection):
-        formated_mesage = Gust_Log.Format_Log_Message(Message, Connection)
+    def System_Log(Code, Message, Connection, User):
+        formated_mesage = Gust_Log.Format_Log_Message(Message, Connection, User)
 
         match Code:
             case 200:   #Successfull system process

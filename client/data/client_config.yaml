@@ -6,5 +6,5 @@ target ip : '127.0.0.1'
 target port : 11811
 
 #storage locations
-client_sources_loc : gust/client/data/pulled_store.yaml
-download_loc : gust/client/data/downloads/
+client_sources_loc : client/data/pulled_store.yaml
+download_loc : client/data/downloads/

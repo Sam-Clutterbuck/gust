@@ -1,4 +1,3 @@
-import re
 
 from socket import AF_INET, socket, SOCK_STREAM
 from _thread import start_new_thread
@@ -56,8 +55,7 @@ class Server_Commands:
             File_Transfer.Transfer_Files(source, breakdown, Client)
 
     def Quit(Client):
-        Client.close()
-        quit()
+        Gust_Server.Gracefull_Close(Client)
 
     COMMANDS["update sources"].update({"func":Update_Sources})
     COMMANDS["download files"].update({"func":Download})
@@ -77,16 +75,18 @@ class Gust_Server:
     HOST_IP = CONFIG_FILE["ip"]
     HOST_PORT = CONFIG_FILE["port"]
     LOGIN_ATTEMPT_LIMIT = CONFIG_FILE["connection attempt limit"]
+    MAX_CONCURRENT_USERS = CONFIG_FILE["max concurrent users"]
     DOWNLOAD_LOG_LOC= CONFIG_FILE["download_log_loc"]
     SOURCE_LOC = CONFIG_FILE["server_sources_loc"]
 
+    CONCURRENT_CONNECTIONS = {}
 
     SERVERSOCKET = socket(AF_INET, SOCK_STREAM)
     #####################
 
     def Connection_Check(Client):
         if Client is None or (Client._closed == True):
-            Gust_Log.System_Log(500,"No active connection",None)
+            Gust_Log.System_Log(500,"No active connection",None, None)
             quit()
 
     def Start_Server():
@@ -94,7 +94,7 @@ class Gust_Server:
         try:
             Gust_Server.SERVERSOCKET.bind((Gust_Server.HOST_IP, Gust_Server.HOST_PORT))
         except socket.error as error:
-            Gust_Log.System_Log(500,str(error),None)
+            Gust_Log.System_Log(500,str(error),None, None)
 
         print('Socket is listening..')
         Gust_Server.SERVERSOCKET.listen(5)
@@ -127,7 +127,7 @@ class Gust_Server:
 
             except OSError as error:
                 if (Client._closed == False):
-                    Gust_Log.System_Log(500,str(error),Client)
+                    Gust_Log.System_Log(500,str(error),Client, None)
                 return
             
 
@@ -142,10 +142,10 @@ class Gust_Server:
 
             except OSError as error:
                 if (Client._closed == False):
-                    Gust_Log.System_Log(500,str(error),Client)
+                    Gust_Log.System_Log(500,str(error),Client, Gust_Server.CONCURRENT_CONNECTIONS[Client])
                 return 
         
-        Client.close()
+        Gust_Server.Gracefull_Close(Client)
 
     def Attempt_Login(Client):
 
@@ -160,24 +160,48 @@ class Gust_Server:
                 login_attempts +=1
 
                 if (login_attempts >= Gust_Server.LOGIN_ATTEMPT_LIMIT):
-                    Gust_Log.Authentication_Log(403, "Excessive Failed login attempts for :" + username, Client)
+                    Gust_Log.Authentication_Log(403, "Excessive Failed login attempts for :" + username, Client, username)
                     Client.send(("Excessive Failed login - Disconnected from server"+Server_Commands.COMMANDS["disconnect"]["command"]).encode())
+                    Client.send("Safe to close".encode())
                     Client.close()
-                    quit()
 
-                Gust_Log.Authentication_Log(401, "Incorrect login details for :" + username, Client)
+                Gust_Log.Authentication_Log(401, "Incorrect login details for :" + username, Client, username)
                 Client.send("Incorrect login details".encode())
             
             else:
                 
-                Gust_Log.Authentication_Log(200, username + " Logged into server", Client)
+                if (len(Gust_Server.CONCURRENT_CONNECTIONS) >= Gust_Server.MAX_CONCURRENT_USERS):
+                    
+                    print("SENT")
+                    Client.send(("Max concurrent users reached - please wait and try again later"+Server_Commands.COMMANDS["disconnect"]["command"]).encode())
+                    Client.close()
+                    quit()
+
+                Gust_Log.Authentication_Log(200, username + " Logged into server", Client, username)
                 Client.send((Server_Commands.COMMANDS["authorised"]["command"]).encode())
+
+                Gust_Server.CONCURRENT_CONNECTIONS.update({Client:username})
 
                 Gust_Server.Send_Public_Key(Client, login_details)
 
                 successful_login = True
             
         return successful_login
+
+    def Username_Grab(Hashed_Login):
+        #custom script to grab the username without needing to allow regex import
+        username = ""
+        seperators_found = 0
+
+        for char in Hashed_Login:
+            if (char == ":"):
+                seperators_found += 1
+                if (seperators_found >= 4):
+                    break
+            else:
+                username += char
+        
+        return username
 
     def Login_Authorisation(Login_Details):
 
@@ -189,14 +213,12 @@ class Gust_Server:
         ###TEMP
 
         #Find username and return to call for logging
-        user_section = re.findall(".*::::", Login_Details)
-        username = re.split("\::::", user_section[0])
-        
+        username = Gust_Server.Username_Grab(Login_Details)
 
         if (Login_Details != login):
-            return False, username[0]
+            return False, username
         
-        return True, username[0]
+        return True, username
     
     def Send_Public_Key(Client, Login_Details):
 
@@ -218,19 +240,25 @@ class Gust_Server:
             decrypted_confirmation = Encrypt_Pki.Decrypt_Message(confirmation)
 
             if (decrypted_confirmation == Server_Commands.COMMANDS["authorised"]["command"]):
-                Gust_Log.Authentication_Log(200, "Public key passed to client successfully", Client)
+                Gust_Log.Authentication_Log(200, "Public key passed to client successfully", Client, Gust_Server.CONCURRENT_CONNECTIONS[Client])
                 authenticated = True
                 return 
             
             if (auth_attempts >= Gust_Server.LOGIN_ATTEMPT_LIMIT):
-                Gust_Log.Authentication_Log(403, "Excessive Failed Public Key authoriusation attempts ", Client)
+                Gust_Log.Authentication_Log(403, "Excessive Failed Public Key authoriusation attempts ", Client, Gust_Server.CONCURRENT_CONNECTIONS[Client])
                 Client.send(("Excessive Failed Public Key authorisation attempts - Disconnected from server"+Server_Commands.COMMANDS["disconnect"]["command"]).encode())
-                Client.close()
+                Gust_Server.Gracefull_Close(Client)
 
-            Gust_Log.Authentication_Log(401, "Incorrect public keys", Client)
+            Gust_Log.Authentication_Log(401, "Incorrect public keys", Client, Gust_Server.CONCURRENT_CONNECTIONS[Client])
                 
     def Recieve_Commands(Client):
 
         recieved_command = Encrypt_Pki.Decrypt_Message(Client.recv(1024))
         Server_Commands.Translate_Command(recieved_command, Client)
         
+    def Gracefull_Close(Client):
+        Gust_Server.CONCURRENT_CONNECTIONS.pop(Client)
+
+        Client.send("Safe to disconnect".encode())
+        Client.close()
+        quit()

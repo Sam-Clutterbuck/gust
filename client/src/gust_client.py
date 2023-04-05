@@ -1,4 +1,3 @@
-import re
 import tqdm
 
 from os import remove
@@ -22,6 +21,8 @@ class Gust_Client:
     CLIENTSOCKET = socket(AF_INET, SOCK_STREAM)
     SOURCE_LOC = CONFIG_FILE["client_sources_loc"]
     DOWNLOAD_LOC = CONFIG_FILE["download_loc"]
+
+    CURRENT_USER = {}
     
     #####################
 
@@ -32,7 +33,7 @@ class Gust_Client:
 
     def Socket_Check(Socket):
         if Socket is None or (Socket._closed == True):
-            Gust_Log.System_Log(500,"No active socket",None)
+            Gust_Log.System_Log(500,"No active socket",None,None)
             quit()
 
     def Start_Client(Manual):
@@ -61,7 +62,7 @@ class Gust_Client:
 
                 except OSError as error:
                     if (open_socket._closed == False):
-                        Gust_Log.System_Log(500,str(error),open_socket)
+                        Gust_Log.System_Log(500,str(error),open_socket, None)
                     return 
 
             while authenticated:
@@ -79,7 +80,7 @@ class Gust_Client:
 
                 except OSError as error:
                     if (open_socket._closed == False):
-                        Gust_Log.System_Log(500,str(error),open_socket)
+                        Gust_Log.System_Log(500,str(error),open_socket,Gust_Client.CURRENT_USER[open_socket])
                     return 
                 
         
@@ -91,24 +92,40 @@ class Gust_Client:
         if Hashed_Login is None:
             Hashed_Login = ""
 
+        username = Gust_Client.Username_Grab(Hashed_Login)
+        Gust_Client.CURRENT_USER.update({Socket: username})
+
         Socket.send(Hashed_Login.encode())
         response = Socket.recv(1024).decode()
         if (response == Gust_Client.COMMANDS["authorised"]["command"]):
-            Gust_Log.Authentication_Log(200, "Connected To Server", Socket)
+            
+            Gust_Log.Authentication_Log(200, "Connected To Server", Socket, username)
             return True
         
         if (response[-13:] == Gust_Client.COMMANDS["disconnect"]["command"]):
 
-            #remove ![DISCONNECT] header
-            message_content = re.findall(".*!", response)
-            message_clean = re.split("!", message_content[0])
-            response = message_clean[0]
-            Gust_Log.Authentication_Log(403,response, Socket)
+            print(response[:-13])
+            Gust_Log.Authentication_Log(403,response[:-13], Socket, username)
             Gust_Client.Close_Socket(Socket)
             
         
         print(response)
         return False
+
+    def Username_Grab(Hashed_Login):
+        #custom script to grab the username without needing to allow regex import
+        username = ""
+        seperators_found = 0
+
+        for char in Hashed_Login:
+            if (char == ":"):
+                seperators_found += 1
+                if (seperators_found >= 4):
+                    break
+            else:
+                username +=char
+        
+        return username
 
     def Manual_Login():
 
@@ -121,6 +138,9 @@ class Gust_Client:
     
     def Close_Socket(Socket):
         Gust_Client.Socket_Check(Socket)
+
+        #wait for it to recieve any kind of message before disconnect for gracefull disconnect on server to occur
+        Socket.recv(1024).decode()
 
         Socket.shutdown(SHUT_RDWR)
         Socket.close()
@@ -140,11 +160,8 @@ class Gust_Client:
 
             #Disconnect command hijacks encrypted_public_key var if errors occur
             if (encrypted_public_key[-13:] == Gust_Client.COMMANDS["disconnect"]["command"]):
-                #remove ![DISCONNECT] header
-                message_content = re.findall(".*!", encrypted_public_key)
-                message_clean = re.split("!", message_content[0])
-                encrypted_public_key = message_clean[0]
-                Gust_Log.Authentication_Log(403,encrypted_public_key, Socket)
+                print(encrypted_public_key[:-13])
+                Gust_Log.Authentication_Log(403,encrypted_public_key[:-13], Socket, Gust_Client.CURRENT_USER[Socket])
                 Gust_Client.Close_Socket(Socket)
                 print(encrypted_public_key)
 
@@ -157,7 +174,7 @@ class Gust_Client:
             decrypted_confirmation = Encrypt_Pki.Decrypt_Message(confirmation)
 
             if (decrypted_confirmation == Gust_Client.COMMANDS["authorised"]["command"]):
-                Gust_Log.Authentication_Log(200, "Successfully recieved Public Key", Socket)
+                Gust_Log.Authentication_Log(200, "Successfully recieved Public Key", Socket, Gust_Client.CURRENT_USER[Socket])
                 
                 encrypted_message = Encrypt_Pki.Encrypt_Message(Gust_Client.COMMANDS["authorised"]["command"], Socket)
                 Socket.send(encrypted_message)
@@ -179,7 +196,7 @@ class Gust_Client:
                 breakdown = Yaml_Editor.Breakdown_Dictionary(source, Gust_Client.SOURCE_LOC)
 
         if breakdown is None:
-            Gust_Log.File_Log(404,"Unable to download : "+ source_name + " as it is not in the clients sources list", Socket)
+            Gust_Log.File_Log(404,"Unable to download : "+ source_name + " as it is not in the clients sources list", Socket, Gust_Client.CURRENT_USER[Socket])
             Socket.send("ERROR".encode())
             return
 

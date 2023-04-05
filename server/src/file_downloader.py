@@ -39,7 +39,7 @@ class File_Download:
         response = requests.get(url, stream = True, allow_redirects=True)
 
         if (response.status_code != 200):
-            Gust_Log.System_Log(500,"[ " + str(response.status_code) + " ] Error occured when downloading file", None)
+            Gust_Log.System_Log(500,"[ " + str(response.status_code) + " ] Error occured when downloading file", None, None)
             return False, None
 
         filename = File_Download.Find_Filename(response.headers)
@@ -51,7 +51,7 @@ class File_Download:
                 if chunk:
                     file.write(chunk)
 
-        Gust_Log.System_Log(200,"Successfully Downloaded: "+filename, None)
+        Gust_Log.System_Log(200,"Successfully Downloaded: "+filename, None, None)
         return True, filename
     
     def Update_Download_Log(Name,Filename,Hash_File):

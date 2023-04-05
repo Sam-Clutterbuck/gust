@@ -8,7 +8,10 @@ port : 11811
 #set how many login attempts before disconnected
 connection attempt limit: 3
 
+#max number of users at one time
+max concurrent users: 2
+
 #storage locations
-server_sources_loc : gust/server/data/gust_store.yaml
-download_log_loc : gust/server/data/downloads.yaml
-download_loc : gust/server/data/downloads/
+server_sources_loc : server/data/gust_store.yaml
+download_log_loc : server/data/downloads.yaml
+download_loc : server/data/downloads/

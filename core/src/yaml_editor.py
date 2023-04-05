@@ -15,7 +15,7 @@ class Yaml_Editor:
             try:
                 yaml_file = yaml.safe_load(file)
             except yaml.YAMLError as error:
-                Gust_Log.System_Log(500,error, None)
+                Gust_Log.System_Log(500,error, None, None)
                 return False, None
         return True, yaml_file
     
@@ -26,7 +26,7 @@ class Yaml_Editor:
                 yaml.dump(Yaml_Content, writer)
                 return True
             except yaml.YAMLError as error:
-                Gust_Log.System_Log(500,error, None)
+                Gust_Log.System_Log(500,error, None, None)
                 return False
 
     def Yaml_Dump(Yaml_Content):

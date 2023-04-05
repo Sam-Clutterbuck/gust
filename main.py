@@ -1,6 +1,15 @@
-from server.src import Server_Commands, Gust_Server, Gust_Sources
+import tests
+
+selection = input("1 = server, 0 = client")
+
+if (selection == "1"):
+    tests.Launch_Server.Start()
+
+if (selection == "0"):
+    tests.Launch_Client.Start()
 
 
-#Server_Commands.Translate_Command("![update_sources]")
 
-Gust_Server.Start_Server()
+#from web.src import TEST
+
+#TEST.Start_Web_App()
