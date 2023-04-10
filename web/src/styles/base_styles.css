@@ -176,7 +176,7 @@ footer p{
     justify-content: center;
     align-content: center;
 
-    overflow-x: hidden; /* Disable horizontal scroll */
+    overflow: hidden;
     transition: 0.5s; 
 }
 
