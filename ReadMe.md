@@ -20,4 +20,4 @@ sha256
 
 The Client also has to be securely locked down to ensure that its connection to an internet connected device (the  server) doesn't compromise its integrity and confidentiality. To assist in this the client can only connect to the servers specific gust port `11811` and doesn't have access to any http(s) ports or web interfaces. On top of this the client only able to accept files and have write access to files from the server transfer and not any other locations on the interior network.
 
-[Find out more about how to use the server in the docs...](/docs/client)
+[Find out more about how to use the client in the docs...](/docs/client)
