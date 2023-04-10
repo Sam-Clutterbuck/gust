@@ -1,8 +1,4 @@
-demo:
-  file: https://drive.google.com/uc?id=1W60dPCoJGMfkvtvxjuiRSpL5OMaLJ9hm&export=download
-  hash_file: https://drive.google.com/uc?id=12tOCGn0CyFLuo6tojekMHVdkzzikBPhx&export=download
+example:
+  file: https://example_file/download
+  hash_file: https://example_file_hash.sha256/download
   hash_type: sha256
-demo3:
-  file: https://drive.google.com/uc?id=1W60dPCoJGMfkvtvxjuiRSpL5OMaLJ9hm&export=download
-  hash_file: https://drive.google.com/uc?id=12tOCGn0CyFLuo6tojekMHVdkzzikBPhx&export=download
-  hash_type: md5
