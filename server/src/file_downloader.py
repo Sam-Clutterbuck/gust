@@ -35,6 +35,10 @@ class File_Download:
         if (success == False):
                 return False, None
 
+        if url is None or (url == ''):
+            Gust_Log.System_Log(500,"Invalid Url provided", None, None)
+            return False, None
+
         #Pull download
         response = requests.get(url, stream = True, allow_redirects=True)
 
