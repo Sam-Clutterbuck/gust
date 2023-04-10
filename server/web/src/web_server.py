@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for
 
 from core.src import Yaml_Editor, Data_Link
 from server.src import Gust_Sources
-from web.src.web_helpers import Web_Helpers
+from server.web.src.web_helpers import Web_Helpers
 
 app = Flask(__name__, template_folder='templates', static_folder='styles')
 
