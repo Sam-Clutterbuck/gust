@@ -36,7 +36,6 @@
                         <form class="login-form" action={{ url_for('Attempt_Login') }} method="post">
                         <input type="text" placeholder="username" name="username"/>
                         <input type="password" placeholder="password" name="password"/>
-                        <input type="hidden" name="current_url" value="{{ request.url }}"/>
                         
                         <button class="form_button">login</button>
                         </form>

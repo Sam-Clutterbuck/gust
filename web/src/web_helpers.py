@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import Flask, render_template, request, session, redirect, url_for, flash
+from flask import request, session, redirect, url_for, flash
 
 from core.src import Yaml_Editor, Data_Link, Integrity_Check
 from server.src import Login_Auth
@@ -83,3 +83,14 @@ class Web_Helpers:
             session.pop("authenticated")
         if "user" in session:
             session.pop("user")
+
+    def Url_Log(Func):
+        @wraps(Func)
+        def Store_Current_Url(*Args, **Kwargs):
+            ## store the url of page for redirects that need to return back to a specific page
+            session["current_url"] = request.url
+            return Func(*Args, **Kwargs)
+        return Store_Current_Url
+    
+    def Get_Previous_Url():
+        return session["current_url"]

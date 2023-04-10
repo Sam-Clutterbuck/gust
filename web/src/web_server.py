@@ -1,5 +1,4 @@
-from flask import Flask, render_template, request, session, redirect, url_for, flash
-
+from flask import Flask, render_template, request, redirect, url_for
 
 from core.src import Yaml_Editor, Data_Link
 from server.src import Gust_Sources
@@ -16,7 +15,6 @@ if (success == False):
 CONFIG_FILE = yaml_file
 
 SOURCE_LOC = CONFIG_FILE["server_sources_loc"]
-test = "HERE"
 app.secret_key = "TEST"
 #####################
 
@@ -35,6 +33,7 @@ def Page_Not_Found(error):
 
 @app.route("/home")
 @app.route("/")
+@Web_Helpers.Url_Log
 def Home():
 
     source_ammount = Web_Helpers.Get_Sources_Number()
@@ -45,6 +44,7 @@ def Home():
 
 @app.route("/sources")
 @Web_Helpers.Authentication_Check
+@Web_Helpers.Url_Log
 def Sources():
     source_ammount, source_headings, data = Web_Helpers.Get_Source_Data()
 
@@ -66,6 +66,7 @@ def Delete_Source():
     return redirect(url_for('Sources'))
 
 @app.route('/login_page', methods=['GET', 'POST'])
+@Web_Helpers.Url_Log
 def Login_Blocker():
     return render_template("./login_block.html")
 
@@ -74,7 +75,7 @@ def Attempt_Login():
 
     username=request.form['username']
     password=request.form['password']
-    current_url=request.form['current_url']
+    current_url=Web_Helpers.Get_Previous_Url()
 
     success, link = Web_Helpers.Log_In(username,password)
 
@@ -90,6 +91,7 @@ def Attempt_Logout():
 
 @app.route("/sources/update/<Source>")
 @Web_Helpers.Authentication_Check
+@Web_Helpers.Url_Log
 def Update_Sources(Source):
 
     data = Web_Helpers.Get_Source_Details()
