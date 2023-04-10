@@ -1,6 +1,6 @@
 
 from socket import AF_INET, socket, SOCK_STREAM
-from _thread import start_new_thread
+from threading import Thread
 
 from core.src import Yaml_Editor, Data_Link, Gust_Log, Encrypt_Pki
 from server.src.file_transferer import File_Transfer
@@ -105,7 +105,8 @@ class Gust_Server:
         while True:
             client, addr = Gust_Server.SERVERSOCKET.accept()
             print('Connection attempt by: ' + addr[0] + ':' + str(addr[1]))
-            start_new_thread(Gust_Server.Server_Steps, (client, ))
+            new_thread = Thread(target=Gust_Server.Server_Steps, args=(client, ))
+            new_thread.start()
         SERVERSOCKET.close()
 
 

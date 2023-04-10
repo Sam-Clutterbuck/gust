@@ -1,4 +1,5 @@
 from os import remove
+from threading import Thread
 
 from server.src.file_downloader import File_Download
 from core.src import Yaml_Editor, Data_Link, Integrity_Check
@@ -111,29 +112,39 @@ class Gust_Sources:
         source_list = Gust_Sources.List_Sources()
 
         for source in source_list:
-            urls = Gust_Sources.Break_Source(source)
+            new_thread = Thread(target=Gust_Sources.Download_Source, args=(source, ))
+            new_thread.start()
             
-            success, hash_filename = File_Download.Download_File(urls["hash_file"])
-            if (success == False):
-                break
-
-            File_Download.Update_Download_Log(source, hash_filename, True)
-
-            success, source_filename = File_Download.Download_File(urls["file"])
-            if (success == False):
-                break
-
-            File_Download.Update_Download_Log(source, source_filename, False)
-
-            
-            matching_hashes = Integrity_Check.Hash_Check(Gust_Sources.DOWNLOAD_LOC+source_filename,Gust_Sources.DOWNLOAD_LOC+hash_filename,urls["hash_type"])
-
-            if (matching_hashes == False):
-                remove(Gust_Sources.DOWNLOAD_LOC+source_filename)
-                remove(Gust_Sources.DOWNLOAD_LOC+hash_filename)
 
         return 
 
+    def Download_Source(Source):
+
+        print("DOWNLOADING:")
+        print(Source)
+
+        urls = Gust_Sources.Break_Source(Source)
+            
+        success, hash_filename = File_Download.Download_File(urls["hash_file"])
+        if (success == False):
+            return
+
+        File_Download.Update_Download_Log(Source, hash_filename, True)
+
+        success, source_filename = File_Download.Download_File(urls["file"])
+        if (success == False):
+            return
+
+        File_Download.Update_Download_Log(Source, source_filename, False)
+
+        
+        matching_hashes = Integrity_Check.Hash_Check(Gust_Sources.DOWNLOAD_LOC+source_filename,Gust_Sources.DOWNLOAD_LOC+hash_filename,urls["hash_type"])
+
+        if (matching_hashes == False):
+            remove(Gust_Sources.DOWNLOAD_LOC+source_filename)
+            remove(Gust_Sources.DOWNLOAD_LOC+hash_filename)
+        
+        return
 
 
 
