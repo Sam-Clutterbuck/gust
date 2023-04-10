@@ -112,13 +112,18 @@ class Gust_Sources:
         source_list = Gust_Sources.List_Sources()
 
         for source in source_list:
-            new_thread = Thread(target=Gust_Sources.Download_Source, args=(source, ))
-            new_thread.start()
+            Gust_Sources.Download_Source(source)
             
 
         return 
 
     def Download_Source(Source):
+
+        new_thread = Thread(target=Gust_Sources.Download_Source_Threading, args=(Source, ))
+        new_thread.start()
+        return
+
+    def Download_Source_Threading(Source):
 
         print("DOWNLOADING:")
         print(Source)
