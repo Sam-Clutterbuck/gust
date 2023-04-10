@@ -131,5 +131,3 @@ dmypy.json
 ./core/data/logs/*
 ./server/data/*
 ./client/data/*
-server/data/downloads.yaml
-server/data/gust_store.yaml
