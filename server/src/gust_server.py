@@ -5,6 +5,7 @@ from _thread import start_new_thread
 from core.src import Yaml_Editor, Data_Link, Gust_Log, Encrypt_Pki
 from server.src.file_transferer import File_Transfer
 from server.src.gust_sources import Gust_Sources
+from server.src.Login_systems import Login_Auth
 
 class Server_Commands:
 
@@ -188,37 +189,14 @@ class Gust_Server:
             
         return successful_login
 
-    def Username_Grab(Hashed_Login):
-        #custom script to grab the username without needing to allow regex import
-        username = ""
-        seperators_found = 0
-
-        for char in Hashed_Login:
-            if (char == ":"):
-                seperators_found += 1
-                if (seperators_found >= 4):
-                    break
-            else:
-                username += char
-        
-        return username
 
     def Login_Authorisation(Login_Details):
 
         if Login_Details is None:
             return False, "No Username Entered"
 
-        ###TEMP
-        login = 'user::::d74ff0ee8da3b9806b18c877dbf29bbde50b5bd8e4dad7a3a725000feb82e8f1' #pass
-        ###TEMP
-
-        #Find username and return to call for logging
-        username = Gust_Server.Username_Grab(Login_Details)
-
-        if (Login_Details != login):
-            return False, username
-        
-        return True, username
+        success, username = Login_Auth.Login_Check(Login_Details)
+        return success, username
     
     def Send_Public_Key(Client, Login_Details):
 

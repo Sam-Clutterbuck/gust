@@ -1,15 +1,14 @@
 import tests
 
-selection = input("1 = server, 0 = client")
+while True:
+    try:
+        selection = int(input("1 = server, 0 = client"))
+        break
+    except ValueError:
+        print("must be valid input")
 
-if (selection == "1"):
+if (selection == 1):
     tests.Launch_Server.Start()
 
-if (selection == "0"):
+if (selection == 0):
     tests.Launch_Client.Start()
-
-
-
-#from web.src import TEST
-
-#TEST.Start_Web_App()

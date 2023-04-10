@@ -43,9 +43,9 @@ class Yaml_Editor:
 
         for source in yaml_file:
             avaliable_sources.append(source)
-            return avaliable_sources
         
-        return None
+        return avaliable_sources
+        
         
 
     def Breakdown_Dictionary(Selected_Header, File):

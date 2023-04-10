@@ -83,6 +83,17 @@ class Gust_Sources:
         source_list = Gust_Sources.Write_Sources(Updated_source)
         return source_list
     
+    def Delete_Source(Source):
+        success, yaml_file = Yaml_Editor.Yaml_Read(Gust_Sources.SOURCE_LOC)
+        if (success == False):
+            return None
+
+        yaml_file.pop(Source)
+
+        Yaml_Editor.Yaml_Write(Gust_Sources.SOURCE_LOC, yaml_file)
+        
+        return 
+
     def Write_Sources(New_Source):
         
         success, yaml_file = Yaml_Editor.Yaml_Read(Gust_Sources.SOURCE_LOC)
