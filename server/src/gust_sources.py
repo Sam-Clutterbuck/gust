@@ -18,6 +18,7 @@ class Gust_Sources:
     CONFIG_FILE = yaml_file
 
     SOURCE_LOC = CONFIG_FILE["server_sources_loc"]
+    DOWNLOAD_LOG_LOC= CONFIG_FILE["download_log_loc"]
     DOWNLOAD_LOC = CONFIG_FILE["download_loc"]
 
     #####################
@@ -91,6 +92,7 @@ class Gust_Sources:
         if Source not in source_list:
             return None
 
+        #Delete Source from file
         success, yaml_file = Yaml_Editor.Yaml_Read(Gust_Sources.SOURCE_LOC)
         if (success == False):
             return None
@@ -98,6 +100,19 @@ class Gust_Sources:
         yaml_file.pop(Source)
 
         Yaml_Editor.Yaml_Write(Gust_Sources.SOURCE_LOC, yaml_file)
+
+
+        #Delete Source from downloads
+        success, yaml_file = Yaml_Editor.Yaml_Read(Gust_Sources.DOWNLOAD_LOG_LOC)
+        if (success == False):
+            return None
+
+        remove(Gust_Sources.DOWNLOAD_LOC+yaml_file[Source]['file'])
+        remove(Gust_Sources.DOWNLOAD_LOC+yaml_file[Source]['hash_file'])
+
+        yaml_file.pop(Source)
+
+        Yaml_Editor.Yaml_Write(Gust_Sources.DOWNLOAD_LOG_LOC, yaml_file)
         
         return 
 

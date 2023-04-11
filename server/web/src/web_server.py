@@ -128,6 +128,7 @@ def Trigger_Source_Update():
 
 @app.route("/downloads")
 @Web_Helpers.Url_Log
+@Web_Helpers.Authentication_Check
 def Downloads():
     ammount, headings, data = Web_Helpers.Get_Downloads_Data()
 

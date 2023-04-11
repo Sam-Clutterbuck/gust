@@ -1,7 +1,3 @@
-TEST:
-  file: TEST.txt
-  hash_file: lorem.sha256
-  last updated: Tue 11 Apr 2023 - 17:24
 demo:
   file: testSource.txt
   hash_file: hash.sha256
