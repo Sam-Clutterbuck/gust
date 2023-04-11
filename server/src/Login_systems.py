@@ -9,6 +9,23 @@ class Login_Auth:
 
     LOGINS = CONFIG_FILE["logins_loc"]
 
+    def List_Logins():
+
+        login_list = []
+        with open(Login_Auth.LOGINS, 'r') as login_file:
+            while True:
+                try:
+                    next_line = login_file.readline()
+
+                    if not next_line:
+                        break
+                    login_list.append(next_line.strip().upper())
+                
+                except :
+                    Gust_Log.System_Log(500,"Error occured reading from file", None, None)
+
+        return login_list
+
     def Login_Check(Hashed_Login):
     
         #Find username and return to call for logging
@@ -19,18 +36,7 @@ class Login_Auth:
         if (exists == False):
             return False, username
 
-        login_list = []
-        with open(Login_Auth.LOGINS, 'r') as login_file:
-            while True:
-                try:
-                    next_line = login_file.readline()
-
-                    if not next_line:
-                        break;
-                    login_list.append(next_line.strip().upper())
-                
-                except :
-                    Gust_Log.System_Log(500,"Error occured reading from file", None, None)
+        login_list = Login_Auth.List_Logins()
                 
 
         for login in login_list:

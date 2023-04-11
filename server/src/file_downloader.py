@@ -18,6 +18,9 @@ class File_Download:
 
     DOWNLOAD_LOC = CONFIG_FILE["download_loc"]
     DOWNLOAD_LOG_LOC= CONFIG_FILE["download_log_loc"]
+
+    DOWNLOADING_STATUS = {}
+
    #####################
 
     def Find_Filename(Header):
@@ -47,6 +50,9 @@ class File_Download:
             return False, None
 
         filename = File_Download.Find_Filename(response.headers)
+        print(response.headers['Content-Length'])
+        File_Download.DOWNLOADING_STATUS.update({url:{"file_size":response.headers['Content-Length'],"download_ammmount":0}})
+        print("DETS = "+File_Download.DOWNLOADING_STATUS[url])
             
         with open(File_Download.DOWNLOAD_LOC+filename, "wb") as file:
             for chunk in response.iter_content(chunk_size=1024):
@@ -54,6 +60,9 @@ class File_Download:
                 # writing one chunk at a time to file
                 if chunk:
                     file.write(chunk)
+                    File_Download.DOWNLOADING_STATUS[url]["download_ammmount"].update(File_Download.DOWNLOADING_STATUS[url]["download_ammmount"] + 1024)
+                    print("LENGTH = "+File_Download.DOWNLOADING_STATUS)
+                    #print(download_set)
 
         Gust_Log.System_Log(200,"Successfully Downloaded: "+filename, None, None)
         return True, filename

@@ -95,7 +95,9 @@ class Gust_Client:
         username = Gust_Client.Username_Grab(Hashed_Login)
         Gust_Client.CURRENT_USER.update({Socket: username})
 
-        Socket.send(Hashed_Login.encode())
+        encrypted_message = Encrypt_Pki.AES_Encrypt(Hashed_Login.upper(), Hashed_Login.encode())
+
+        Socket.send(encrypted_message)
         response = Socket.recv(1024).decode()
         if (response == Gust_Client.COMMANDS["authorised"]["command"]):
             

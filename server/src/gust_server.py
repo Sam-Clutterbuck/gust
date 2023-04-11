@@ -149,14 +149,28 @@ class Gust_Server:
         
         Gust_Server.Gracefull_Close(Client)
 
+    def AES_Login_Checks(Message):
+        
+        login_list = Login_Auth.List_Logins()
+
+        for login in login_list:
+            success, decrypted_message = Encrypt_Pki.AES_Decrypt(login, Message)
+            if success:
+                return True, decrypted_message
+        
+        return False, None
+
     def Attempt_Login(Client):
 
         successful_login = False
         login_attempts = 0
 
         while not successful_login:
-            login_details = Client.recv(1024).decode()
-            success, username = Gust_Server.Login_Authorisation(login_details)
+            login_details = Client.recv(1024)
+
+
+
+            success, username, decrypted_login = Gust_Server.Login_Authorisation(login_details)
                     
             if (success == False):
                 login_attempts +=1
@@ -184,7 +198,7 @@ class Gust_Server:
 
                 Gust_Server.CONCURRENT_CONNECTIONS.update({Client:username})
 
-                Gust_Server.Send_Public_Key(Client, login_details)
+                Gust_Server.Send_Public_Key(Client, decrypted_login)
 
                 successful_login = True
             
@@ -194,10 +208,16 @@ class Gust_Server:
     def Login_Authorisation(Login_Details):
 
         if Login_Details is None:
-            return False, "No Username Entered"
+            return False, "No Username Entered", None
 
-        success, username = Login_Auth.Login_Check(Login_Details)
-        return success, username
+        Decrypted, decrypted_login = Gust_Server.AES_Login_Checks(Login_Details)
+
+        if Decrypted:
+            success, username = Login_Auth.Login_Check(decrypted_login)
+
+            return success, username, decrypted_login
+
+        return False, "Error Occured", None
     
     def Send_Public_Key(Client, Login_Details):
 

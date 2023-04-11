@@ -19,6 +19,8 @@ class Gust_Sources:
 
     SOURCE_LOC = CONFIG_FILE["server_sources_loc"]
     DOWNLOAD_LOC = CONFIG_FILE["download_loc"]
+    
+    DOWNLOADING_STATUS = {}
 
     #####################
 
@@ -128,6 +130,8 @@ class Gust_Sources:
         print("DOWNLOADING:")
         print(Source)
 
+        Gust_Sources.DOWNLOADING_STATUS.update({Source:0})
+
         urls = Gust_Sources.Break_Source(Source)
             
         success, hash_filename = File_Download.Download_File(urls["hash_file"])
@@ -148,7 +152,9 @@ class Gust_Sources:
         if (matching_hashes == False):
             remove(Gust_Sources.DOWNLOAD_LOC+source_filename)
             remove(Gust_Sources.DOWNLOAD_LOC+hash_filename)
+
         
+        print("DOWNLOADED FIN")
         return
 
 
