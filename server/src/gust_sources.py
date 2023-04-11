@@ -1,39 +1,27 @@
 from os import remove
 from threading import Thread
 
+from server.src.server_config_link import Server_Global
 from server.src.file_downloader import File_Download
-from core.src import Yaml_Editor, Data_Link, Integrity_Check
+from core.src import Yaml_Editor, Integrity_Check
 
 
 
 
 class Gust_Sources:
     
-    #####################
-    #Globals
-
-    success, yaml_file = Yaml_Editor.Yaml_Read(Data_Link.server_config)
-    if (success == False):
-        yaml_file = {}
-    CONFIG_FILE = yaml_file
-
-    SOURCE_LOC = CONFIG_FILE["server_sources_loc"]
-    DOWNLOAD_LOG_LOC= CONFIG_FILE["download_log_loc"]
-    DOWNLOAD_LOC = CONFIG_FILE["download_loc"]
-
-    #####################
 
     def List_Sources():
-        sources = Yaml_Editor.List_Headers(Gust_Sources.SOURCE_LOC)
+        sources = Yaml_Editor.List_Headers(Server_Global.SOURCE_LOC)
         return sources
     
     def Break_Source(Selected_Source):
-        breakdown = Yaml_Editor.Breakdown_Dictionary(Selected_Source, Gust_Sources.SOURCE_LOC)
+        breakdown = Yaml_Editor.Breakdown_Dictionary(Selected_Source, Server_Global.SOURCE_LOC)
         return breakdown
 
     def Add_Source(Name,URL,Hash_URL,Hash_Type):
         
-        success, yaml_file = Yaml_Editor.Yaml_Read(Gust_Sources.SOURCE_LOC)
+        success, yaml_file = Yaml_Editor.Yaml_Read(Server_Global.SOURCE_LOC)
         if (success == False):
             return None
 
@@ -62,7 +50,7 @@ class Gust_Sources:
 
     def Update_Source(Name,URL,Hash_URL,Hash_Type):
         
-        success, yaml_file = Yaml_Editor.Yaml_Read(Gust_Sources.SOURCE_LOC)
+        success, yaml_file = Yaml_Editor.Yaml_Read(Server_Global.SOURCE_LOC)
         if (success == False):
             return None
 
@@ -93,38 +81,38 @@ class Gust_Sources:
             return None
 
         #Delete Source from file
-        success, yaml_file = Yaml_Editor.Yaml_Read(Gust_Sources.SOURCE_LOC)
+        success, yaml_file = Yaml_Editor.Yaml_Read(Server_Global.SOURCE_LOC)
         if (success == False):
             return None
 
         yaml_file.pop(Source)
 
-        Yaml_Editor.Yaml_Write(Gust_Sources.SOURCE_LOC, yaml_file)
+        Yaml_Editor.Yaml_Write(Server_Global.SOURCE_LOC, yaml_file)
 
 
         #Delete Source from downloads
-        success, yaml_file = Yaml_Editor.Yaml_Read(Gust_Sources.DOWNLOAD_LOG_LOC)
+        success, yaml_file = Yaml_Editor.Yaml_Read(Server_Global.DOWNLOAD_LOG_LOC)
         if (success == False):
             return None
 
-        remove(Gust_Sources.DOWNLOAD_LOC+yaml_file[Source]['file'])
-        remove(Gust_Sources.DOWNLOAD_LOC+yaml_file[Source]['hash_file'])
+        remove(Server_Global.DOWNLOAD_LOC+yaml_file[Source]['file'])
+        remove(Server_Global.DOWNLOAD_LOC+yaml_file[Source]['hash_file'])
 
         yaml_file.pop(Source)
 
-        Yaml_Editor.Yaml_Write(Gust_Sources.DOWNLOAD_LOG_LOC, yaml_file)
+        Yaml_Editor.Yaml_Write(Server_Global.DOWNLOAD_LOG_LOC, yaml_file)
         
         return 
 
     def Write_Sources(New_Source):
         
-        success, yaml_file = Yaml_Editor.Yaml_Read(Gust_Sources.SOURCE_LOC)
+        success, yaml_file = Yaml_Editor.Yaml_Read(Server_Global.SOURCE_LOC)
         if (success == False):
             return None
 
         yaml_file.update(New_Source)
 
-        Yaml_Editor.Yaml_Write(Gust_Sources.SOURCE_LOC, yaml_file)
+        Yaml_Editor.Yaml_Write(Server_Global.SOURCE_LOC, yaml_file)
         
         return yaml_file
 
@@ -166,11 +154,11 @@ class Gust_Sources:
         File_Download.Update_Download_Log(Source, source_filename, False)
 
         
-        matching_hashes = Integrity_Check.Hash_Check(Gust_Sources.DOWNLOAD_LOC+source_filename,Gust_Sources.DOWNLOAD_LOC+hash_filename,urls["hash_type"])
+        matching_hashes = Integrity_Check.Hash_Check(Server_Global.DOWNLOAD_LOC+source_filename,Gust_Sources.DOWNLOAD_LOC+hash_filename,urls["hash_type"])
 
         if (matching_hashes == False):
-            remove(Gust_Sources.DOWNLOAD_LOC+source_filename)
-            remove(Gust_Sources.DOWNLOAD_LOC+hash_filename)
+            remove(Server_Global.DOWNLOAD_LOC+source_filename)
+            remove(Server_Global.DOWNLOAD_LOC+hash_filename)
 
         return
 

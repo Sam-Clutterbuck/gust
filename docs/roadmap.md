@@ -10,10 +10,15 @@
 		 - [ ] one way traffic in specific use cases
 		 - [ ] only open on required ports
 	 - [ ] Server docker have http(s) traffic blocking to only allow from selected urls
- - [ ] add ability to trigger file download from web gui
-	 - [ ] have a list of what files are and aren't downloaded and the dates
-	 - [ ] ability to select a file to download on its own
-	 - [ ] download percentage bars?
+ - [x] add ability to trigger file download from web gui
+	 - [x] have a list of what files are and aren't downloaded and the dates
+	 - [x] ability to select a file to download on its own
+	 - [x] download percentage bars
+ - [ ] Cli tools for client and server controling
+ - [ ] User creation, editing and password reset functionality
+	 - [x] python code
+	 - [ ] Web gui version
+	 - [ ] Cli version
 
 ## future plans
 

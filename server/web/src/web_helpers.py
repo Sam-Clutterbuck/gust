@@ -2,24 +2,10 @@ from datetime import datetime
 from functools import wraps
 from flask import request, session, redirect, url_for, flash
 
-from core.src import Yaml_Editor, Data_Link, Integrity_Check
-from server.src import Login_Auth, File_Download
+from core.src import Yaml_Editor, Integrity_Check
+from server.src import Login_Auth, File_Download, Server_Global
 
 class Web_Helpers:
-
-    #####################
-    #Globals
-
-    success, yaml_file = Yaml_Editor.Yaml_Read(Data_Link.server_config)
-    if (success == False):
-        yaml_file = {}
-    CONFIG_FILE = yaml_file
-
-    SOURCE_LOC = CONFIG_FILE["server_sources_loc"]
-    DOWNLOAD_LOG_LOC = CONFIG_FILE["download_log_loc"]
-    
-
-    #####################
 
     def Authentication_Check(Func):
         @wraps(Func)
@@ -61,9 +47,9 @@ class Web_Helpers:
     
     def Get_Source_Data():
         source_headings = ["Source Name","Source Url","Hash Url","Hash Type"]
-        data = Web_Helpers.Get_Details(Web_Helpers.SOURCE_LOC)
+        data = Web_Helpers.Get_Details(Server_Global.SOURCE_LOC)
 
-        source_ammount = Web_Helpers.Get_Header_Number(Web_Helpers.SOURCE_LOC)
+        source_ammount = Web_Helpers.Get_Header_Number(Server_Global.SOURCE_LOC)
 
         return source_ammount, source_headings, data
     
@@ -102,9 +88,9 @@ class Web_Helpers:
         headings = ["Source Name","Last Updated","Updated Today", "Download Progress"]
         time = datetime.now().strftime("%a %d %b %Y")
 
-        sources = Yaml_Editor.List_Headers(Web_Helpers.SOURCE_LOC)
+        sources = Yaml_Editor.List_Headers(Server_Global.SOURCE_LOC)
         
-        data = Web_Helpers.Get_Details(Web_Helpers.DOWNLOAD_LOG_LOC)
+        data = Web_Helpers.Get_Details(Server_Global.DOWNLOAD_LOG_LOC)
 
         format_data = []
 
@@ -129,7 +115,7 @@ class Web_Helpers:
                 format_data.append([source])
 
 
-        ammount = Web_Helpers.Get_Header_Number(Web_Helpers.DOWNLOAD_LOG_LOC)
+        ammount = Web_Helpers.Get_Header_Number(Server_Global.DOWNLOAD_LOG_LOC)
 
         
 
@@ -137,7 +123,7 @@ class Web_Helpers:
     
     def Download_Info():
 
-        sources = Web_Helpers.Get_Details(Web_Helpers.SOURCE_LOC)
+        sources = Web_Helpers.Get_Details(Server_Global.SOURCE_LOC)
 
         staged_data = []
 
@@ -148,7 +134,7 @@ class Web_Helpers:
             else:
 
                 #check for undownloaded sources
-                downloads = Web_Helpers.Get_Details(Web_Helpers.DOWNLOAD_LOG_LOC)
+                downloads = Web_Helpers.Get_Details(Server_Global.DOWNLOAD_LOG_LOC)
                 
                 downloaded_source = False
                 for downloded in downloads:

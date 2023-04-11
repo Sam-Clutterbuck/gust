@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
-from psutil import cpu_percent 
 
 from server.src import Gust_Sources, File_Download
 from server.web.src.web_helpers import Web_Helpers

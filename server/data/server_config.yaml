@@ -16,3 +16,4 @@ server_sources_loc : server/data/gust_store.yaml
 download_log_loc : server/data/downloads.yaml
 download_loc : server/data/downloads/
 logins_loc: server/data/passwd
+server_commands : server/data/server_cli_commands.txt
