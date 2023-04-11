@@ -1,18 +1,12 @@
-from core.src import Integrity_Check, Data_Link, Gust_Log, Yaml_Editor
+from core.src import Integrity_Check, Gust_Log, Yaml_Editor
+from server.src.server_config_link import Server_Global
 
 class Login_Auth:
-
-    success, yaml_file = Yaml_Editor.Yaml_Read(Data_Link.server_config)
-    if (success == False):
-        yaml_file = {}
-    CONFIG_FILE = yaml_file
-
-    LOGINS = CONFIG_FILE["logins_loc"]
 
     def List_Logins():
 
         login_list = []
-        with open(Login_Auth.LOGINS, 'r') as login_file:
+        with open(Server_Global.LOGINS, 'r') as login_file:
             while True:
                 try:
                     next_line = login_file.readline()
@@ -31,7 +25,7 @@ class Login_Auth:
         #Find username and return to call for logging
         username = Login_Auth.Username_Grab(Hashed_Login)
 
-        exists = Integrity_Check.File_Check(Login_Auth.LOGINS)
+        exists = Integrity_Check.File_Check(Server_Global.LOGINS)
 
         if (exists == False):
             return False, username

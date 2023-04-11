@@ -1,4 +1,5 @@
 from server.src.login_systems import Login_Auth
+from server.src.server_config_link import Server_Global
 from core.src import Integrity_Check, Gust_Log
 
 class Account_Control:
@@ -40,7 +41,7 @@ class Account_Control:
             Gust_Log.System_Log(500,f"Trying to create user {New_User} that already exists", None, Admin_Verification)
             return False
         
-        with open(Login_Auth.LOGINS, 'a') as login_file:
+        with open(Server_Global.LOGINS, 'a') as login_file:
             login_file.write(Account_Control.Format_Username(New_User,New_Password)+"\n")
 
         Gust_Log.System_Log(200,f"Created New user: {New_User}", None, Admin_Verification)
@@ -63,7 +64,7 @@ class Account_Control:
             else:
                 new_login_list.append(login)
 
-        with open(Login_Auth.LOGINS, 'w') as login_file:
+        with open(Server_Global.LOGINS, 'w') as login_file:
             for login in new_login_list:
                 login_file.write(login+"\n")
 
@@ -85,7 +86,7 @@ class Account_Control:
             if (Login_Auth.Username_Grab(login).upper() != Target_User.upper()):
                 new_login_list.append(login)
 
-        with open(Login_Auth.LOGINS, 'w') as login_file:
+        with open(Server_Global.LOGINS, 'w') as login_file:
             for login in new_login_list:
                 login_file.write(login+"\n")
 
