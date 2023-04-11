@@ -1,8 +1,9 @@
+from datetime import datetime
 from functools import wraps
 from flask import request, session, redirect, url_for, flash
 
 from core.src import Yaml_Editor, Data_Link, Integrity_Check
-from server.src import Login_Auth
+from server.src import Login_Auth, File_Download
 
 class Web_Helpers:
 
@@ -15,6 +16,8 @@ class Web_Helpers:
     CONFIG_FILE = yaml_file
 
     SOURCE_LOC = CONFIG_FILE["server_sources_loc"]
+    DOWNLOAD_LOG_LOC = CONFIG_FILE["download_log_loc"]
+    
 
     #####################
 
@@ -29,16 +32,16 @@ class Web_Helpers:
             return redirect( url_for("Login_Blocker"))
         return Check_For_User
 
-    def Get_Sources_Number():
-        sources = Yaml_Editor.List_Headers(Web_Helpers.SOURCE_LOC)
+    def Get_Header_Number(Location):
+        sources = Yaml_Editor.List_Headers(Location)
 
         if sources is None:
             return 0
 
         return len(sources)
     
-    def Get_Source_Details():
-        sources = Yaml_Editor.List_Headers(Web_Helpers.SOURCE_LOC)
+    def Get_Details(Location):
+        sources = Yaml_Editor.List_Headers(Location)
 
         data = []
 
@@ -47,7 +50,7 @@ class Web_Helpers:
 
         for header in sources:
             values = [header]
-            pairs = Yaml_Editor.Breakdown_Dictionary(header,Web_Helpers.SOURCE_LOC)
+            pairs = Yaml_Editor.Breakdown_Dictionary(header,Location)
 
             for key in pairs:
                 values.append(pairs[key])
@@ -58,9 +61,9 @@ class Web_Helpers:
     
     def Get_Source_Data():
         source_headings = ["Source Name","Source Url","Hash Url","Hash Type"]
-        data = Web_Helpers.Get_Source_Details()
+        data = Web_Helpers.Get_Details(Web_Helpers.SOURCE_LOC)
 
-        source_ammount = Web_Helpers.Get_Sources_Number()
+        source_ammount = Web_Helpers.Get_Header_Number(Web_Helpers.SOURCE_LOC)
 
         return source_ammount, source_headings, data
     
@@ -94,3 +97,67 @@ class Web_Helpers:
     
     def Get_Previous_Url():
         return session["current_url"]
+    
+    def Get_Downloads_Data():
+        headings = ["Source Name","Last Updated","Updated Today", "Download Progress"]
+        time = datetime.now().strftime("%a %d %b %Y")
+
+        sources = Yaml_Editor.List_Headers(Web_Helpers.SOURCE_LOC)
+        
+        data = Web_Helpers.Get_Details(Web_Helpers.DOWNLOAD_LOG_LOC)
+
+        format_data = []
+
+        for row in data:
+            temp_data = []
+            temp_data.append(row[0])
+            temp_data.append(row[3])
+            if time in row[3]:
+                temp_data.append(True)
+                
+            format_data.append(temp_data)
+
+        #add any sources that exist but aren't downloaded
+        for source in sources:
+            match = False
+            for row in format_data:
+                if (row[0] == source):
+                    match = True
+                    break 
+            
+            if not match:
+                format_data.append([source])
+
+
+        ammount = Web_Helpers.Get_Header_Number(Web_Helpers.DOWNLOAD_LOG_LOC)
+
+        
+
+        return ammount, headings, format_data
+    
+    def Download_Info():
+
+        sources = Web_Helpers.Get_Details(Web_Helpers.SOURCE_LOC)
+
+        staged_data = []
+
+        for source in sources:
+            if source[1] in File_Download.DOWNLOADING_STATUS:
+                percentage = (File_Download.DOWNLOADING_STATUS[source[1]]['download_ammmount'] / File_Download.DOWNLOADING_STATUS[source[1]]['file_size']) * 100
+                staged_data.append([source[0], percentage])
+            else:
+
+                #check for undownloaded sources
+                downloads = Web_Helpers.Get_Details(Web_Helpers.DOWNLOAD_LOG_LOC)
+                
+                downloaded_source = False
+                for downloded in downloads:
+                    if (source[0] == downloded[0]):
+                        downloaded_source = True
+                
+                if downloaded_source:
+                    staged_data.append([source[0], 100])
+                else:
+                    staged_data.append([source[0], 0])
+
+        return staged_data

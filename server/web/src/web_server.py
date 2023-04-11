@@ -1,7 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
+from psutil import cpu_percent 
 
-from core.src import Yaml_Editor, Data_Link
-from server.src import Gust_Sources
+from server.src import Gust_Sources, File_Download
 from server.web.src.web_helpers import Web_Helpers
 
 app = Flask(__name__, template_folder='templates', static_folder='styles')
@@ -9,12 +9,6 @@ app = Flask(__name__, template_folder='templates', static_folder='styles')
 #####################
 #Globals
 
-success, yaml_file = Yaml_Editor.Yaml_Read(Data_Link.server_config)
-if (success == False):
-    yaml_file = {}
-CONFIG_FILE = yaml_file
-
-SOURCE_LOC = CONFIG_FILE["server_sources_loc"]
 app.secret_key = "TEST"
 #####################
 
@@ -22,48 +16,17 @@ def Start_Web_App():
     app.run(host="0.0.0.0", port=80, debug=True)
 
 
-########################
+########################################################################
 # Error Handles
 
 @app.errorhandler(404)
 def Page_Not_Found(error):
     return render_template("./404.html")
 
-########################
+########################################################################
 
-@app.route("/home")
-@app.route("/")
-@Web_Helpers.Url_Log
-def Home():
-
-    source_ammount = Web_Helpers.Get_Sources_Number()
-
-    return render_template("./home.html", defined_sources_ammount=source_ammount)
-
-
-
-@app.route("/sources")
-@Web_Helpers.Authentication_Check
-@Web_Helpers.Url_Log
-def Sources():
-    source_ammount, source_headings, data = Web_Helpers.Get_Source_Data()
-
-    return render_template("./sources.html", defined_sources_ammount=source_ammount, headings=source_headings, data=data)
-
-@app.route("/sources/delete", methods=['POST'])
-@Web_Helpers.Authentication_Check
-def Delete_Source():
-    Source_Name=request.form['Source_Name']
-
-    if Source_Name not in Yaml_Editor.List_Headers(SOURCE_LOC):
-        print("COULDN'T FIND SOURCE")
-        return redirect(url_for('Sources'))
-    
-
-    if Source_Name is not None:
-        Gust_Sources.Delete_Source(Source_Name)
-    
-    return redirect(url_for('Sources'))
+########################################################################
+#Login logic
 
 @app.route('/login_page', methods=['GET', 'POST'])
 @Web_Helpers.Url_Log
@@ -89,12 +52,47 @@ def Attempt_Logout():
     Web_Helpers.Log_Out()
     return redirect(url_for("Home"))
 
+########################################################################
+# Home page
+
+@app.route("/home")
+@app.route("/")
+@Web_Helpers.Url_Log
+def Home():
+
+    source_ammount = Web_Helpers.Get_Header_Number(Web_Helpers.SOURCE_LOC)
+
+    return render_template("./home.html", defined_sources_ammount=source_ammount)
+
+
+########################################################################
+# Sources pages
+
+@app.route("/sources")
+@Web_Helpers.Authentication_Check
+@Web_Helpers.Url_Log
+def Sources():
+    source_ammount, source_headings, data = Web_Helpers.Get_Source_Data()
+
+    return render_template("./sources.html", defined_sources_ammount=source_ammount, headings=source_headings, data=data)
+
+@app.route("/sources/delete", methods=['POST'])
+@Web_Helpers.Authentication_Check
+def Delete_Source():
+    Source_Name=request.form['Source_Name']
+
+    if Source_Name is not None:
+        Gust_Sources.Delete_Source(Source_Name)
+    
+    return redirect(url_for('Sources'))
+
+
 @app.route("/sources/update/<Source>")
 @Web_Helpers.Authentication_Check
 @Web_Helpers.Url_Log
 def Update_Sources(Source):
 
-    data = Web_Helpers.Get_Source_Details()
+    data = Web_Helpers.Get_Details(Web_Helpers.SOURCE_LOC)
 
     source_name = ""
     source_url = ""
@@ -122,3 +120,51 @@ def Trigger_Source_Update():
     Gust_Sources.Update_Source(source_name,source_url,hash_url,hash_type)
 
     return redirect(url_for('Sources'))
+
+
+########################################################################
+# Downloads pages
+
+
+@app.route("/downloads")
+@Web_Helpers.Url_Log
+def Downloads():
+    ammount, headings, data = Web_Helpers.Get_Downloads_Data()
+
+    if (len(File_Download.DOWNLOADING_STATUS) > 0):
+        downloading_files = True
+        print("TRUYE")
+    else:
+        downloading_files = False
+
+
+    test = request.args.get('text')
+    print(test)
+
+    return render_template("./downloads.html", download_ammount=ammount, headings=headings, data=data, downloading_files=downloading_files)
+
+@app.route("/downloads/begin", methods=['POST'])
+@Web_Helpers.Authentication_Check
+def Download_Source():
+    Source_Name=request.form['Source_Name']
+
+    if Source_Name is not None:
+        Gust_Sources.Download_Source(Source_Name)
+    
+    return redirect(url_for('Downloads'))
+
+
+@app.route("/downloads/begin/all", methods=['GET'])
+@Web_Helpers.Authentication_Check
+def Download_All_Sources():
+    
+    Gust_Sources.Download_Sources()
+    
+    return redirect(url_for('Downloads'))
+
+
+@app.route('/_download_Progress', methods= ['GET'])
+def Download_Progress():
+
+    data = Web_Helpers.Download_Info()
+    return jsonify(data)

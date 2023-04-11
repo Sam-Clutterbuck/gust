@@ -1,12 +1,16 @@
+TEST:
+  file: TEST.txt
+  hash_file: lorem.sha256
+  last updated: Tue 11 Apr 2023 - 17:24
 demo:
   file: testSource.txt
   hash_file: hash.sha256
-  last updated: Mon 10 Apr 2023 - 17:52
+  last updated: Tue 11 Apr 2023 - 17:06
 demo3:
   file: testSource.txt
   hash_file: hash.sha256
-  last updated: Mon 10 Apr 2023 - 17:52
+  last updated: Tue 11 Apr 2023 - 17:06
 lorem:
   file: TEST.txt
   hash_file: lorem.sha256
-  last updated: Mon 10 Apr 2023 - 17:52
+  last updated: Tue 11 Apr 2023 - 17:17

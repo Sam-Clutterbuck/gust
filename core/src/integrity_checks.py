@@ -57,11 +57,11 @@ class Integrity_Check:
         source_hash = hash_check.hexdigest()
 
         if (source_hash == hash_data.decode()):
-            print("Hash integrity check succeded : " + Source_File)
+            print(f"Hash integrity check succeded : {Source_File}")
             Gust_Log.Authentication_Log(200,"Hash integrity check succeded : " + Source_File, None, None)
             return True
         else:
-            print("Hash integrity check failed : " + Source_File)
+            print(f"Hash integrity check failed : {Source_File}")
             Gust_Log.Authentication_Log(404,"Hash integrity check failed : " + Source_File, None, None)
             return False
         

@@ -10,4 +10,7 @@ lorem:
   file: https://drive.google.com/uc?id=1WFd0Ix9wnJqc20OlEoN3WCT5s812--CC&export=download
   hash_file: https://drive.google.com/uc?id=1B0vMx7hMG4TERxsNTzaGwVZpfm4R-F5N&export=download
   hash_type: sha256
-
+TEST:
+  file: https://drive.google.com/uc?id=1WFd0Ix9wnJqc20OlEoN3WCT5s812--CC&export=download
+  hash_file: https://drive.google.com/uc?id=1B0vMx7hMG4TERxsNTzaGwVZpfm4R-F5N&export=download
+  hash_type: sha256

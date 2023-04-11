@@ -50,9 +50,8 @@ class File_Download:
             return False, None
 
         filename = File_Download.Find_Filename(response.headers)
-        print(response.headers['Content-Length'])
-        File_Download.DOWNLOADING_STATUS.update({url:{"file_size":response.headers['Content-Length'],"download_ammmount":0}})
-        print("DETS = "+File_Download.DOWNLOADING_STATUS[url])
+        File_Download.DOWNLOADING_STATUS.update({url:{"file_size":int(response.headers['Content-Length']),"download_ammmount":0}})
+       
             
         with open(File_Download.DOWNLOAD_LOC+filename, "wb") as file:
             for chunk in response.iter_content(chunk_size=1024):
@@ -60,11 +59,14 @@ class File_Download:
                 # writing one chunk at a time to file
                 if chunk:
                     file.write(chunk)
-                    File_Download.DOWNLOADING_STATUS[url]["download_ammmount"].update(File_Download.DOWNLOADING_STATUS[url]["download_ammmount"] + 1024)
-                    print("LENGTH = "+File_Download.DOWNLOADING_STATUS)
-                    #print(download_set)
+                    File_Download.DOWNLOADING_STATUS[url].update({"download_ammmount":File_Download.DOWNLOADING_STATUS[url]["download_ammmount"] + 1024})
+                    
 
         Gust_Log.System_Log(200,"Successfully Downloaded: "+filename, None, None)
+
+        if (File_Download.DOWNLOADING_STATUS[url]["download_ammmount"] >= File_Download.DOWNLOADING_STATUS[url]["file_size"]):
+            File_Download.DOWNLOADING_STATUS.pop(url)
+
         return True, filename
     
     def Update_Download_Log(Name,Filename,Hash_File):
