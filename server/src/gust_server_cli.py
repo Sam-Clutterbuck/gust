@@ -1,10 +1,15 @@
+import server.src.client_removal_check 
+
 from getpass import getpass
 
 from server.src.server_config_link import Server_Global
 from server.src.account_control import Account_Control
 from server.src.login_systems import Login_Auth
 from server.src.gust_sources import Gust_Sources
+from server.src.gust_server import Gust_Server
 from core.src.yaml_editor import Yaml_Editor
+
+
 
 class Gust_Server_Cli:
 
@@ -228,6 +233,12 @@ class Gust_Server_Cli:
       return
     Account_Control.Password_Reset(Gust_Server_Cli.CURRENT_USER[1],inputs[0],inputs[1])
 
+  @Confirm_Authenticated
+  def Start_Server():
+    print("Starting Server")
+    Gust_Server.Start_Server()
+    
+
   CLI_COMMANDS['commands']['login'].update({'func':Sign_In})
   CLI_COMMANDS['commands']['quit'].update({'func':quit})
   CLI_COMMANDS['commands']['help'].update({'func':Print_Help})
@@ -241,3 +252,4 @@ class Gust_Server_Cli:
   CLI_COMMANDS['commands']['new_user'].update({'func':New_User})
   CLI_COMMANDS['commands']['del_user'].update({'func':Delete_User})
   CLI_COMMANDS['commands']['passwd_reset'].update({'func':Password_Reset})
+  CLI_COMMANDS['commands']['start_server'].update({'func':Start_Server})

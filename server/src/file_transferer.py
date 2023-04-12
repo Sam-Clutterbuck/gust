@@ -1,3 +1,5 @@
+import server.src.client_removal_check 
+
 from os.path import getsize
 from time import sleep
 

@@ -1,3 +1,5 @@
+import client.src.server_removal_check
+
 import tqdm
 
 from os import remove

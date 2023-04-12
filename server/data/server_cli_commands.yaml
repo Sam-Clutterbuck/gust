@@ -75,4 +75,9 @@ commands:
     args:
       username : "Username of target user"
       new password: "New password for target user"
+
+  start_server:
+    alt: ['ss']
+    args:
+      none: "No arguments required"
     

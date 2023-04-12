@@ -1,3 +1,5 @@
+import server.src.client_removal_check 
+
 from os import remove
 from threading import Thread
 

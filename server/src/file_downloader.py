@@ -1,3 +1,5 @@
+import server.src.client_removal_check 
+
 import re
 import requests
 

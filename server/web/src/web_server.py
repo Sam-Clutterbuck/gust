@@ -1,3 +1,5 @@
+import server.src.client_removal_check 
+
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 
 from server.src import Gust_Sources, File_Download

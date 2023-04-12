@@ -1,3 +1,5 @@
+import server.src.client_removal_check 
+
 from datetime import datetime
 from functools import wraps
 from flask import request, session, redirect, url_for, flash
