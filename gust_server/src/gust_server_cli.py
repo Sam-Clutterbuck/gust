@@ -6,7 +6,7 @@ from gust_server.src.server_config_link import Server_Global
 from gust_server.src.account_control import Account_Control
 from gust_server.src.login_systems import Login_Auth
 from gust_server.src.gust_sources import Gust_Sources
-from gust_server.src.gust_server import Gust_Server
+from gust_server.src.gust_server_source import Gust_Server
 from gust_core.src.yaml_editor import Yaml_Editor
 
 
