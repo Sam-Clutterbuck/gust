@@ -1,6 +1,0 @@
-demo:
-  hash_type: sha256
-demo3:
-  hash_type: sha256
-lorem:
-  hash_type: sha256
