@@ -1,0 +1,20 @@
+######################################
+# Server / Source Options 
+######################################
+#Default setup as loopback address
+ip : '127.0.0.1'
+port : 11811
+
+#set how many login attempts before disconnected
+connection attempt limit: 3
+
+#max number of users at one time
+max concurrent users: 2
+
+#storage locations
+server_sources_loc : gust_server/data/gust_store.yaml
+download_log_loc : gust_server/data/downloads.yaml
+download_loc : gust_server/data/downloads/
+logins_loc: gust_server/data/passwd
+server_cli_help : gust_server/data/server_cli_help.txt
+server_cli_commands : gust_server/data/server_cli_commands.yaml
