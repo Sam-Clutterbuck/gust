@@ -164,7 +164,7 @@ class Gust_Server_Cli:
   def Add_Source():
     print("Adding New Source")
     inputs = Gust_Server_Cli.Input_Cycle("add_source")
-    if (inputs == None):
+    if inputs is None:
       return
     Gust_Sources.Add_Source(inputs[0],inputs[1],inputs[2],inputs[3])
     Gust_Server_Cli.Print_Sources()
@@ -173,7 +173,7 @@ class Gust_Server_Cli:
   def Update_Source():
     print("Updating Source")
     inputs = Gust_Server_Cli.Input_Cycle("update_source")
-    if (inputs == None):
+    if inputs is None:
       return
     Gust_Sources.Update_Source(inputs[0],inputs[1],inputs[2],inputs[3])
     Gust_Server_Cli.Print_Sources()
@@ -182,7 +182,7 @@ class Gust_Server_Cli:
   def Delete_Source():
     print("Deleting Source")
     inputs = Gust_Server_Cli.Input_Cycle("delete_source")
-    if (inputs == None):
+    if inputs is None:
       return
     Gust_Sources.Delete_Source(inputs[0])
     Gust_Server_Cli.Print_Sources()
@@ -198,7 +198,7 @@ class Gust_Server_Cli:
   def Download_Source():
     print("Downloading Selected Source")
     inputs = Gust_Server_Cli.Input_Cycle("source_download")
-    if (inputs == None):
+    if inputs is None:
       return
     Gust_Sources.Download_Source(inputs[0])
     Gust_Server_Cli.Print_Downloads()
@@ -208,7 +208,7 @@ class Gust_Server_Cli:
   def New_User():
     print("Adding New User")
     inputs = Gust_Server_Cli.Input_Cycle("new_user")
-    if (inputs == None):
+    if inputs is None:
       return
     Account_Control.Add_User(Gust_Server_Cli.CURRENT_USER[1],inputs[0],inputs[1])
 
@@ -216,7 +216,7 @@ class Gust_Server_Cli:
   def Delete_User():
     print("Deleting User")
     inputs = Gust_Server_Cli.Input_Cycle("del_user")
-    if (inputs == None):
+    if inputs is None:
       return
     Account_Control.Delete_User(Gust_Server_Cli.CURRENT_USER[1],inputs[0])
 
@@ -224,7 +224,7 @@ class Gust_Server_Cli:
   def Password_Reset():
     print("Reseting User Password")
     inputs = Gust_Server_Cli.Input_Cycle("passwd_reset")
-    if (inputs == None):
+    if inputs is None:
       return
     Account_Control.Password_Reset(Gust_Server_Cli.CURRENT_USER[1],inputs[0],inputs[1])
 

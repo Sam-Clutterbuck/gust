@@ -36,7 +36,7 @@ var interval = setInterval(function(){Update_Progress(); Downloads_Progress();},
 function Update_Progress(){
     $.getJSON("/_download_Progress",
     function(data) {
-        for (row in data){
+        for (let row in data){
             let id = data[row][0];
             let percentage = data[row][1];   
             let elem = document.getElementById(id+'_progressbar');        
@@ -51,7 +51,7 @@ function Downloads_Progress(){
     function(data) {
         var files = 0;
         var downloaded = 0;
-        for (row in data){
+        for (let row in data){
             files += 1;
             let percentage = data[row][1];
             if (percentage == 100){
