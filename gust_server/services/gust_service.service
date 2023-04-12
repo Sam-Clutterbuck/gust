@@ -1,0 +1,9 @@
+#!/bin/sh
+
+#Run task in background
+python /app/services.py 0 &
+
+#ADD PROCNAME
+#ADD QUITE MODE
+#ADD WAY TO ONLY RUN ONE
+#ADD STOP START STATUS
