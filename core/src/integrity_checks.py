@@ -57,12 +57,10 @@ class Integrity_Check:
         source_hash = hash_check.hexdigest()
 
         if (source_hash == hash_data.decode()):
-            print(f"Hash integrity check succeded : {Source_File}")
-            Gust_Log.Authentication_Log(200,"Hash integrity check succeded : " + Source_File, None, None)
+            Gust_Log.Authentication_Log(200,f"Hash integrity check succeded : {Source_File}", None, None)
             return True
         else:
-            print(f"Hash integrity check failed : {Source_File}")
-            Gust_Log.Authentication_Log(404,"Hash integrity check failed : " + Source_File, None, None)
+            Gust_Log.Authentication_Log(404,f"Hash integrity check failed : {Source_File}", None, None)
             return False
         
     def Sha256_Encode(Message):

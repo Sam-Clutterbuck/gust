@@ -13,6 +13,7 @@ class Server_Global:
     DOWNLOAD_LOG_LOC= config_file["download_log_loc"]
     DOWNLOAD_LOC = config_file["download_loc"]
     SOURCE_LOC = config_file["server_sources_loc"]
+    SERVER_CLI_HELP = config_file["server_cli_help"]
     SERVER_CLI_COMMANDS = config_file["server_cli_commands"]
     LOGINS = config_file["logins_loc"]
     

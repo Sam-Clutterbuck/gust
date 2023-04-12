@@ -15,10 +15,12 @@
 	 - [x] ability to select a file to download on its own
 	 - [x] download percentage bars
  - [ ] Cli tools for client and server controling
+	 - [x] server cli
+	 - [ ] client cli
  - [ ] User creation, editing and password reset functionality
 	 - [x] python code
 	 - [ ] Web gui version
-	 - [ ] Cli version
+	 - [x] Cli version
 
 ## future plans
 

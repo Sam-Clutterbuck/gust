@@ -1,0 +1,78 @@
+info:
+  component: "Gust Server Cli Tools"
+  version: 0.0.1
+  created by: "@Sam-Clutterbuck"
+commands:
+  login:
+    alt: ['l']
+    args: 
+      none: "No arguments required"
+
+  quit:
+    alt: ['q']
+    args:  
+      none: "No arguments required"
+    
+  help:
+    alt: ['h','list']
+    args:  
+      none: "No arguments required"
+    
+  print_sources:
+    alt: ['ps','p']
+    args:  
+      none: "No arguments required"
+    
+  add_source:
+    alt: ['as']
+    args:
+      name : "Human readable name for the target source"
+      source url: "Url of the target source"
+      hash url: "Url of the hash for the target source"
+      hash type: "Hash type used for target source"
+    
+  update_source:
+    alt: ['us']
+    args:
+      name : "Human readable name for the target source"
+      source url: "Url of the target source"
+      hash url: "Url of the hash for the target source"
+      hash type: "Hash type used for target source"
+    
+  delete_source:
+    alt: ['ds']
+    args:
+      name : "Human readable name of the target source"
+    
+  print_downloads:
+    alt: ['pd']
+    args:  
+      none: "No arguments required"
+    
+  download_all:
+    alt: ['da', 'd']
+    args:  
+      none: "No arguments required"
+    
+  source_download:
+    alt: ['sd']
+    args:
+      name : "Human readable name of the target source"
+    
+  new_user:
+    alt: ['nu','n']
+    args:
+      username : "Username of new user"
+      password: "Password of new user"
+    
+  del_user:
+    alt: ['du']
+    args:
+      username : "Username of target user"
+    
+  passwd_reset:
+    alt: ['pr', 'uu']
+    args:
+      username : "Username of target user"
+      new password: "New password for target user"
+    

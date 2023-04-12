@@ -34,7 +34,7 @@ class Login_Auth:
                 
 
         for login in login_list:
-            if (login == Hashed_Login.upper()):
+            if (login.upper() == Hashed_Login.upper()):
                 return True, username
         
         return False, username

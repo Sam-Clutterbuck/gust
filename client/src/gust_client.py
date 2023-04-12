@@ -322,9 +322,9 @@ class Gust_Client:
 
                 Commands_Global.COMMANDS[option]["func"](Socket)
 
-    COMMANDS["update sources"].update({"func":Prep_Sources_Update})
-    COMMANDS["transfer files"].update({"func":Prep_File_Transfer})
-    COMMANDS["list options"].update({"func":List_Commands})
-    COMMANDS["download files"].update({"func":Wait_Downloads})
-    COMMANDS["quit"].update({"func":Close_Socket})
+    Commands_Global.COMMANDS["update sources"].update({"func":Prep_Sources_Update})
+    Commands_Global.COMMANDS["transfer files"].update({"func":Prep_File_Transfer})
+    Commands_Global.COMMANDS["list options"].update({"func":List_Commands})
+    Commands_Global.COMMANDS["download files"].update({"func":Wait_Downloads})
+    Commands_Global.COMMANDS["quit"].update({"func":Close_Socket})
     
