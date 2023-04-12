@@ -1,4 +1,4 @@
-from client.src import Gust_Client 
+from gust_client.src import Gust_Client 
 
 #Helper Module for starting Client
 

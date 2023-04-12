@@ -1,0 +1,64 @@
+{% extends "base.html" %}  
+{% block title %}Sources{% endblock %}  
+
+{% block content %}     
+<div class="base_clamp">
+    <div class="column_container">
+        <div class="info_section column-75">
+            <h1>{{defined_sources_ammount}}</h1>
+            {% if defined_sources_ammount == 1 %}
+                <h2>Source Defined</h2>
+            {% else %}
+                <h2>Sources Defined</h2>
+            {% endif %}
+        </div>
+        <div class="button_section column-25">
+            <a class="button" href={{ url_for('Update_Sources', Source="new source") }}>Add Source</a>
+        </div>
+        
+    </div>
+</div>
+
+<div class="sources_list">
+    <table>
+        <tr>
+            {% for header in headings %}
+            <th>{{ header }}</th>
+            {% endfor %}
+            <th>Options</th>
+        </tr>
+        {% for row in data %}
+        <tr>
+            <td class="source_name" id="{{ row[0] }}">{{ row[0] }}</td>
+            <td><a class="source_link" href={{ row[1] }}>{{ row[1] }}</a></td>
+            <td><a class="source_link" href={{ row[2] }}>{{ row[2] }}</a></td>
+            <td>{{ row[3] }}</td>
+
+            <td>
+                <a class="fa" id="icon" href={{ url_for('Update_Sources', Source=row[0]) }}>&#xf040;</a> 
+                <a class="fa" id="icon" onclick="Overlay_Pull_Down('confirmation_popup'), Replace_Delete_Text('delete_text', 'Source_Name', '{{ row[0] }}' )">&#xf1e2;</a>    
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<div class="overlay" id="confirmation_popup">
+    <div class="column_container base_clamp">
+        <div class="confirm_box form">
+            <div class="column-75">
+                <h3> Are you sure you would like to delete <span id="delete_text">THIS</span></h3>
+            </div>
+            <div class="column-25">
+                <form action={{ url_for('Delete_Source') }} method="post">
+                    <input type="hidden" id="Source_Name" name="Source_Name" value="THIS"/>
+                    <button class="button_inverted">Yes</button>
+                    <a class="button_inverted" href="javascript:void(0)" class="closebtn" onclick="Overlay_Push_Up('confirmation_popup')">No</a>
+                </form>
+            </div>
+            <a href="javascript:void(0)" class="closebtn fa" onclick="Overlay_Push_Up('confirmation_popup')">&#xf00d;</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}  

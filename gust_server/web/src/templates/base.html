@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Gust Web App - {% block title %}{% endblock %}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script type="text/javascript" src="/styles/scripts/helpers.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">       
+        <link rel="stylesheet" href="/styles/base_styles.css" type="text/css">
+        <link rel="stylesheet" href="/styles/form_style.css" type="text/css">
+        {% block headings %}{% endblock %}
+    </head>
+
+    <body onload="Auto_Login_Open('login_page')">
+        {% if get_flashed_messages() %}
+            {% if "Incorrect username or password" in get_flashed_messages()%}
+                <script>Invalid_Login();</script>
+            {% endif %}
+        {% endif %}
+
+        <div class="header">
+            <nav>
+                <a class="header_title"  href={{ url_for('Home') }}>Gust.</h1>
+                <a href={{ url_for('Home') }} id="icon" class="fa">&#xf015;</a>
+
+                {% if "user" in session %}
+
+                    <a href={{ url_for('Sources') }} id="icon" class="fa">&#xf07c;</a>
+                    <a href={{ url_for('Downloads') }} id="icon" class="fa">&#xf019;</a>
+                    <a href="{{ url_for("Attempt_Logout") }}" id="icon" class="fa"><p>{{ session["user"] }}</p> &#xf08b;</a>
+                    
+
+                {% else %}
+                    <a onclick="Overlay_Pull_Down('login_page')"  id="icon" class="fa">&#xf090;</a>
+                {% endif %}
+
+            </nav>
+        </div>
+        
+
+        
+        
+        
+        <div class="overlay" id="login_page">
+            <div class="login-page">
+                <div class="form top_level form_offset">
+                    <a href="javascript:void(0)" class="closebtn fa" onclick="Overlay_Push_Up('login_page')">&#xf00d;</a><br>
+                    <div class="login">
+                    <div class="login-header">
+                        <h3>Login</h3>
+                        <p>Please enter your credentials to login.</p>
+
+                        {% with messages = get_flashed_messages() %}
+                            {% if messages %}
+                                {% for msg in messages %}
+                                    <p class="error">{{msg}}</p>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+
+                        
+                    </div>
+                    </div>
+                    <form class="login-form" action={{ url_for('Attempt_Login') }} method="post">
+                    <input type="text" placeholder="username" name="username"/>
+                    <input type="password" placeholder="password" name="password"/>
+                    <button class="form_button">login</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="first_div">
+        {% block content %}
+        {% endblock %}
+        </div>
+
+      
+       <footer>
+            <p>Created By @Sam-Clutterbuck (Version 0.0.1) 2023</p>
+       </footer>
+        
+    </body>
+</html>

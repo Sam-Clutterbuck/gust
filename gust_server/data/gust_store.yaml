@@ -1,0 +1,12 @@
+demo:
+  file: https://drive.google.com/uc?id=1W60dPCoJGMfkvtvxjuiRSpL5OMaLJ9hm&export=download
+  hash_file: https://drive.google.com/uc?id=12tOCGn0CyFLuo6tojekMHVdkzzikBPhx&export=download
+  hash_type: sha256
+demo3:
+  file: https://drive.google.com/uc?id=1W60dPCoJGMfkvtvxjuiRSpL5OMaLJ9hm&export=download
+  hash_file: https://drive.google.com/uc?id=12tOCGn0CyFLuo6tojekMHVdkzzikBPhx&export=download
+  hash_type: sha256
+lorem:
+  file: https://drive.google.com/uc?id=1WFd0Ix9wnJqc20OlEoN3WCT5s812--CC&export=download
+  hash_file: https://drive.google.com/uc?id=1B0vMx7hMG4TERxsNTzaGwVZpfm4R-F5N&export=download
+  hash_type: sha256

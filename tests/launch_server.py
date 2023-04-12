@@ -1,4 +1,4 @@
-from server.src import Gust_Server
+from gust_server.src import Gust_Server
 
 #Helper Module for starting Server
 
