@@ -54,17 +54,31 @@ class Encrypt_Pki:
     def Prep_Public_Key(AES_Key):
 
         raw_public_key = Encrypt_Pki.PUBLIC_KEY.save_pkcs1("PEM")
-        AES_cipher = Encrypt_Pki.Get_Symmetric_Cipher(AES_Key)
+        encrypted_public_key = Encrypt_Pki.AES_Encrypt(AES_Key, raw_public_key)
 
-        encrypted_public_key = AES_cipher.encrypt(raw_public_key)
         return encrypted_public_key
 
     def Decrypt_Public_Key(Public_Key, AES_Key, Connection):
-        AES_cipher = Encrypt_Pki.Get_Symmetric_Cipher(AES_Key)
 
-        decrypted_raw_public_key = AES_cipher.decrypt(Public_Key).decode()
+        success, decrypted_raw_public_key = Encrypt_Pki.AES_Decrypt(AES_Key, Public_Key)
         decrypted_public_key = rsa.PublicKey.load_pkcs1(decrypted_raw_public_key)
         Encrypt_Pki.Link_Public_Key(decrypted_public_key, Connection)
 
         return decrypted_public_key
+    
+    def AES_Encrypt(AES_Key, Message):
+        AES_cipher = Encrypt_Pki.Get_Symmetric_Cipher(AES_Key)
+        encrypted_message = AES_cipher.encrypt(Message)
+        return encrypted_message
+    
+    def AES_Decrypt(AES_Key, Message):
+        AES_cipher = Encrypt_Pki.Get_Symmetric_Cipher(AES_Key)
 
+        try:
+            decrypted_message = AES_cipher.decrypt(Message).decode()
+        except:
+            return False, "failed"
+
+            
+        #decrypted_message = AES_cipher.decrypt(Message).decode()
+        return True, decrypted_message

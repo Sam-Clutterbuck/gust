@@ -1,9 +1,12 @@
+import server.src.client_removal_check 
+
 import re
 import requests
 
 from datetime import datetime
 
-from core.src import  Yaml_Editor, Data_Link, Integrity_Check, Gust_Log
+from core.src import  Yaml_Editor, Integrity_Check, Gust_Log
+from server.src.server_config_link import Server_Global
 
 
 class File_Download:
@@ -11,13 +14,8 @@ class File_Download:
    #####################
    #Globals
 
-    success, yaml_file = Yaml_Editor.Yaml_Read(Data_Link.server_config)
-    if (success == False):
-        yaml_file = {}
-    CONFIG_FILE = yaml_file
+    DOWNLOADING_STATUS = {}
 
-    DOWNLOAD_LOC = CONFIG_FILE["download_loc"]
-    DOWNLOAD_LOG_LOC= CONFIG_FILE["download_log_loc"]
    #####################
 
     def Find_Filename(Header):
@@ -31,7 +29,7 @@ class File_Download:
    
     def Download_File(url):
        
-        success = Integrity_Check.Dir_Check(File_Download.DOWNLOAD_LOC) 
+        success = Integrity_Check.Dir_Check(Server_Global.DOWNLOAD_LOC) 
         if (success == False):
                 return False, None
 
@@ -47,20 +45,28 @@ class File_Download:
             return False, None
 
         filename = File_Download.Find_Filename(response.headers)
+        File_Download.DOWNLOADING_STATUS.update({url:{"file_size":int(response.headers['Content-Length']),"download_ammmount":0}})
+       
             
-        with open(File_Download.DOWNLOAD_LOC+filename, "wb") as file:
+        with open(Server_Global.DOWNLOAD_LOC+filename, "wb") as file:
             for chunk in response.iter_content(chunk_size=1024):
         
                 # writing one chunk at a time to file
                 if chunk:
                     file.write(chunk)
+                    File_Download.DOWNLOADING_STATUS[url].update({"download_ammmount":File_Download.DOWNLOADING_STATUS[url]["download_ammmount"] + 1024})
+                    
 
         Gust_Log.System_Log(200,"Successfully Downloaded: "+filename, None, None)
+
+        if (File_Download.DOWNLOADING_STATUS[url]["download_ammmount"] >= File_Download.DOWNLOADING_STATUS[url]["file_size"]):
+            File_Download.DOWNLOADING_STATUS.pop(url)
+
         return True, filename
     
     def Update_Download_Log(Name,Filename,Hash_File):
 
-        success, yaml_file = Yaml_Editor.Yaml_Read(File_Download.DOWNLOAD_LOG_LOC)
+        success, yaml_file = Yaml_Editor.Yaml_Read(Server_Global.DOWNLOAD_LOG_LOC)
         if (success == False):
             return False
         
@@ -75,6 +81,6 @@ class File_Download:
         else :
             yaml_file[Name].update({'file': Filename})
 
-        Yaml_Editor.Yaml_Write(File_Download.DOWNLOAD_LOG_LOC, yaml_file)
+        Yaml_Editor.Yaml_Write(Server_Global.DOWNLOAD_LOG_LOC, yaml_file)
      
         return True

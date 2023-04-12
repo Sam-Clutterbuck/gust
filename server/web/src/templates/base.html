@@ -4,6 +4,7 @@
         <title>Gust Web App - {% block title %}{% endblock %}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <script type="text/javascript" src="/styles/scripts/helpers.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">       
         <link rel="stylesheet" href="/styles/base_styles.css" type="text/css">
         <link rel="stylesheet" href="/styles/form_style.css" type="text/css">
@@ -25,6 +26,7 @@
                 {% if "user" in session %}
 
                     <a href={{ url_for('Sources') }} id="icon" class="fa">&#xf07c;</a>
+                    <a href={{ url_for('Downloads') }} id="icon" class="fa">&#xf019;</a>
                     <a href="{{ url_for("Attempt_Logout") }}" id="icon" class="fa"><p>{{ session["user"] }}</p> &#xf08b;</a>
                     
 
@@ -75,7 +77,7 @@
 
       
        <footer>
-            <p>Created By @Sam-Clutterbuck (Version 1.0.0) 2023</p>
+            <p>Created By @Sam-Clutterbuck (Version 0.0.1) 2023</p>
        </footer>
         
     </body>

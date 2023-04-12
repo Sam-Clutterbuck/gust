@@ -1,38 +1,29 @@
+import server.src.client_removal_check 
+
 from os import remove
 from threading import Thread
 
+from server.src.server_config_link import Server_Global
 from server.src.file_downloader import File_Download
-from core.src import Yaml_Editor, Data_Link, Integrity_Check
+from core.src import Yaml_Editor, Integrity_Check
 
 
 
 
 class Gust_Sources:
     
-    #####################
-    #Globals
-
-    success, yaml_file = Yaml_Editor.Yaml_Read(Data_Link.server_config)
-    if (success == False):
-        yaml_file = {}
-    CONFIG_FILE = yaml_file
-
-    SOURCE_LOC = CONFIG_FILE["server_sources_loc"]
-    DOWNLOAD_LOC = CONFIG_FILE["download_loc"]
-
-    #####################
 
     def List_Sources():
-        sources = Yaml_Editor.List_Headers(Gust_Sources.SOURCE_LOC)
+        sources = Yaml_Editor.List_Headers(Server_Global.SOURCE_LOC)
         return sources
     
     def Break_Source(Selected_Source):
-        breakdown = Yaml_Editor.Breakdown_Dictionary(Selected_Source, Gust_Sources.SOURCE_LOC)
+        breakdown = Yaml_Editor.Breakdown_Dictionary(Selected_Source, Server_Global.SOURCE_LOC)
         return breakdown
 
     def Add_Source(Name,URL,Hash_URL,Hash_Type):
         
-        success, yaml_file = Yaml_Editor.Yaml_Read(Gust_Sources.SOURCE_LOC)
+        success, yaml_file = Yaml_Editor.Yaml_Read(Server_Global.SOURCE_LOC)
         if (success == False):
             return None
 
@@ -46,22 +37,14 @@ class Gust_Sources:
 
         for source in yaml_file:
             if (source == Name):
-                print(Name+" Already exists, would you like to overide this save?")
-                overide = input("[1 = yes, 0 = no] ")
-                if (overide != "1"):
-                    print("Cannot not add already existing source")
-                    return None
-                
-                print("Updating : "+yaml_file[source]['file']+" to : "+URL)
-                print("Updating : "+yaml_file[source]['hash_file']+" to : "+Hash_URL)
-                print("Updating : "+yaml_file[source]['hash_type']+" to : "+Hash_Type)
+                return None
         
             source_list = Gust_Sources.Write_Sources(new_source)
             return source_list
 
     def Update_Source(Name,URL,Hash_URL,Hash_Type):
         
-        success, yaml_file = Yaml_Editor.Yaml_Read(Gust_Sources.SOURCE_LOC)
+        success, yaml_file = Yaml_Editor.Yaml_Read(Server_Global.SOURCE_LOC)
         if (success == False):
             return None
 
@@ -73,37 +56,67 @@ class Gust_Sources:
                 }
         }
 
+        exists = False
         for source in yaml_file:
             if (source == Name):
-                print(source+" Already Exists:")
+                exists = True
                 print("Updating : "+yaml_file[source]['file']+" to : "+URL)
                 print("Updating : "+yaml_file[source]['hash_file']+" to : "+Hash_URL)
                 print("Updating : "+yaml_file[source]['hash_type']+" to : "+Hash_Type)
 
+        if (exists == False):
+            return None
 
         source_list = Gust_Sources.Write_Sources(Updated_source)
         return source_list
     
     def Delete_Source(Source):
-        success, yaml_file = Yaml_Editor.Yaml_Read(Gust_Sources.SOURCE_LOC)
+
+        source_list = Gust_Sources.List_Sources()
+
+        if Source not in source_list:
+            return None
+
+        #Delete Source from file
+        success, yaml_file = Yaml_Editor.Yaml_Read(Server_Global.SOURCE_LOC)
         if (success == False):
             return None
 
         yaml_file.pop(Source)
 
-        Yaml_Editor.Yaml_Write(Gust_Sources.SOURCE_LOC, yaml_file)
+        Yaml_Editor.Yaml_Write(Server_Global.SOURCE_LOC, yaml_file)
+
+
+        #Delete Source from downloads
+        success, yaml_file = Yaml_Editor.Yaml_Read(Server_Global.DOWNLOAD_LOG_LOC)
+        if (success == False):
+            return None
+        
+        exists = False
+        for sources in yaml_file:
+            if (Source == sources):
+                exists = True
+                if Integrity_Check.File_Check(Server_Global.DOWNLOAD_LOC+yaml_file[Source]['file']):
+                    remove(Server_Global.DOWNLOAD_LOC+yaml_file[Source]['file'])
+                if Integrity_Check.File_Check(Server_Global.DOWNLOAD_LOC+yaml_file[Source]['hash_file']):
+                    remove(Server_Global.DOWNLOAD_LOC+yaml_file[Source]['hash_file'])
+
+        if (exists == True):
+            yaml_file.pop(Source)
+
+        Yaml_Editor.Yaml_Write(Server_Global.DOWNLOAD_LOG_LOC, yaml_file)
         
         return 
 
     def Write_Sources(New_Source):
         
-        success, yaml_file = Yaml_Editor.Yaml_Read(Gust_Sources.SOURCE_LOC)
+        success, yaml_file = Yaml_Editor.Yaml_Read(Server_Global.SOURCE_LOC)
         if (success == False):
             return None
 
         yaml_file.update(New_Source)
 
-        Yaml_Editor.Yaml_Write(Gust_Sources.SOURCE_LOC, yaml_file)
+        Yaml_Editor.Yaml_Write(Server_Global.SOURCE_LOC, yaml_file)
         
         return yaml_file
 
@@ -112,16 +125,23 @@ class Gust_Sources:
         source_list = Gust_Sources.List_Sources()
 
         for source in source_list:
-            new_thread = Thread(target=Gust_Sources.Download_Source, args=(source, ))
-            new_thread.start()
+            Gust_Sources.Download_Source(source)
             
 
         return 
 
     def Download_Source(Source):
 
-        print("DOWNLOADING:")
-        print(Source)
+        source_list = Gust_Sources.List_Sources()
+
+        if Source not in source_list:
+            return
+
+        new_thread = Thread(target=Gust_Sources.Download_Source_Threading, args=(Source, ))
+        new_thread.start()
+        return
+
+    def Download_Source_Threading(Source):
 
         urls = Gust_Sources.Break_Source(Source)
             
@@ -138,12 +158,12 @@ class Gust_Sources:
         File_Download.Update_Download_Log(Source, source_filename, False)
 
         
-        matching_hashes = Integrity_Check.Hash_Check(Gust_Sources.DOWNLOAD_LOC+source_filename,Gust_Sources.DOWNLOAD_LOC+hash_filename,urls["hash_type"])
+        matching_hashes = Integrity_Check.Hash_Check(Server_Global.DOWNLOAD_LOC+source_filename,Server_Global.DOWNLOAD_LOC+hash_filename,urls["hash_type"])
 
         if (matching_hashes == False):
-            remove(Gust_Sources.DOWNLOAD_LOC+source_filename)
-            remove(Gust_Sources.DOWNLOAD_LOC+hash_filename)
-        
+            remove(Server_Global.DOWNLOAD_LOC+source_filename)
+            remove(Server_Global.DOWNLOAD_LOC+hash_filename)
+
         return
 
 

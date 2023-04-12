@@ -1,0 +1,91 @@
+{% extends "base.html" %}  
+{% block title %}Sources{% endblock %}  
+
+{% block content %}     
+<div class="base_clamp">
+    <div class="column_container">
+        <div class="info_section">
+            <h1>{{download_ammount}}</h1>
+            {% if download_ammount == 1 %}
+                <h2>Source Downloaded</h2>
+            {% else %}
+                <h2>Sources Downloaded</h2>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div>
+    <div class="column_container cta">
+        <div class="column-25"></div>
+        <div class="column-50">
+            <h2>Download All Sources</h2>
+            <a class="button" href={{ url_for('Download_All_Sources') }} style="margin: -5% 0% 5% 0%;">Download All <span class="fa">&#xf019;</span></a>
+
+            
+
+            <div class="progress_border">
+                <div class="progress_bar" id="progressbar" style="width:0%;"></div>
+             </div>
+             <p style="color: var(--off-white);"><span id="progress_status">Calculating...</span> Files Downloaded</p>
+
+
+        </div>
+        <div class="column-25"></div>
+
+        
+        
+    </div>
+</div>
+
+<div class="sources_list">
+    <table>
+        <tr>
+            {% for header in headings %}
+            <th>{{ header }}</th>
+            {% endfor %}
+            <th>Options</th>
+        </tr>
+        {% for row in data %}
+        <tr>
+            <td class="source_name" id="{{ row[0] }}">{{ row[0] }}</td>
+            <td>{{ row[1] }}</td>
+            {% if row[2] == True %}
+                <td style="background-color: var(--success); text-align: center;"><span class="fa">&#xf14a;</span></td>
+            {% else %}
+                <td style="background-color: var(--error); text-align: center;"><span class="fa">&#xf2d3;</span></td>
+            {% endif %}
+
+            
+            <td id="{{ row[0] }}_progress">
+                <div class="progress_border">
+                    <div class="progress_bar" id="{{ row[0] }}_progressbar" style="width:0%;"></div>
+                 </div>
+            </td>
+            <td>
+                <a class="fa" id="icon" onclick="Overlay_Pull_Down('confirmation_popup'), Replace_Delete_Text('delete_text', 'Source_Name', '{{ row[0] }}' )">&#xf019;</a>    
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<div class="overlay" id="confirmation_popup">
+    <div class="column_container base_clamp">
+        <div class="confirm_box form">
+            <div class="column-75">
+                <h3> Would you like to download <span id="delete_text">THIS</span></h3>
+            </div>
+            <div class="column-25">
+                <form action={{ url_for('Download_Source') }} method="post">
+                    <input type="hidden" id="Source_Name" name="Source_Name" value="THIS"/>
+                    <button class="button_inverted">Yes</button>
+                    <a class="button_inverted" href="javascript:void(0)" class="closebtn" onclick="Overlay_Push_Up('confirmation_popup')">No</a>
+                </form>
+            </div>
+            <a href="javascript:void(0)" class="closebtn fa" onclick="Overlay_Push_Up('confirmation_popup')">&#xf00d;</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}  

@@ -1,3 +1,3 @@
-from server.src import Gust_Sources
+from server.src.gust_server_cli import Gust_Server_Cli
 
-Gust_Sources.Download_Sources()
+Gust_Server_Cli.Cli_Startup()

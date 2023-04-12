@@ -69,3 +69,48 @@ The download sources command runs through all of the sources in the list downloa
 ```
 download
 ```
+
+# Server Cli Service
+If you want to interact with the gust server you can either use the cli interface or web gui. If you choose to use the cli run the command:
+```
+python gust-server
+```
+
+The following commands are avaliable to use in the cli:
+```
+Gust Server Cli Tools
+version: 0.0.1
+created by: @Sam-Clutterbuck
+
+python gust-server.py 
+
+Commands:
+
+    help          Show this message and exit
+
+    Source Control:
+
+    print_sources   [ARGS]: None
+    add_source      [ARGS]: Name, URL, Hash_URL, Hash_Type
+    update_source   [ARGS]: Name, URL, Hash_URL, Hash_Type
+    delete_source   [ARGS]: Source Name
+
+    Downloads:
+
+    print_downloads [ARGS]: None
+    download_all    [ARGS]: None
+    download_source [ARGS]: Source Name
+
+    User Control:
+
+    new_user        [ARGS]: Username, Password
+    del_user        [ARGS]: Target Username
+    passwd_reset    [ARGS]: Target Username, New Password
+
+    Services:
+
+    restart_server  [ARGS]: None
+    start_server  [ARGS]: None
+    stop_server  [ARGS]: None
+
+```

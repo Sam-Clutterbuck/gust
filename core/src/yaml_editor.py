@@ -59,3 +59,45 @@ class Yaml_Editor:
                 return yaml_file[header]
         
         return None
+
+    def Format(Yaml_File, Newline):
+        
+        Yaml_Editor.Formating_Loop(Yaml_File, Newline, 0)
+        return
+    
+    def Formating_Loop(Yaml_File, Newline, Indent):
+    
+        if (Newline == True):
+            endpoint = ':\n'
+        else:
+            endpoint = ': '
+
+        try:
+
+            if (type(Yaml_File) == str):
+
+                Yaml_Editor.Indent(Indent, Newline)
+                print(Yaml_File)
+                return
+            
+            elif (type(Yaml_File) == dict):
+
+                for key in Yaml_File:
+                    Yaml_Editor.Indent(Indent, Newline)
+                    if (type(Yaml_File[key]) == str):
+                        print(f"{key}: {Yaml_File[key]}")
+                    else:    
+                        print(key, end=endpoint)
+                        Yaml_Editor.Formating_Loop(Yaml_File[key], Newline, Indent+1)
+        
+        except:
+            return
+        
+    def Indent(Indent_Ammount, Newline):
+
+        #smaller indents for multiline readability
+        if (Newline == True):
+            print(('  ' * Indent_Ammount), end='')
+        else:
+            print(('\t' * Indent_Ammount), end='')
+
