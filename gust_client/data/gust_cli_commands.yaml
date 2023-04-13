@@ -1,0 +1,41 @@
+info:
+  component: "Gust Client Cli Tools"
+  version: 0.0.1
+  created by: "@Sam-Clutterbuck"
+commands:
+  connect:
+    alt: ['c', 'login', 'l']
+    args: 
+      none: "No arguments required"
+
+  quit:
+    alt: ['q']
+    args:  
+      none: "No arguments required"
+    
+  help:
+    alt: ['h','list']
+    args:  
+      none: "No arguments required"
+    
+  print_sources:
+    alt: ['ps','p']
+    args:  
+      none: "No arguments required"
+
+  update_sources:
+    alt: ['us']
+    args:  
+      none: "No arguments required"
+    
+  transfer_all:
+    alt: ['ta']
+    args:  
+      none: "No arguments required"
+    
+  transfer_source:
+    alt: ['ts']
+    args:
+      name : "Human readable name of the target source"
+
+    

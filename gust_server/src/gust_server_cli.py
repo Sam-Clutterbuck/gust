@@ -103,7 +103,7 @@ class Gust_Server_Cli:
       selection = input("\nEnter a command to run: ").lower()
 
       if not Gust_Server_Cli.Command_Validate(selection):
-        print(f"'{selection}' Is an invalid command \n[use 'help' or 'l' to list options]")
+        print(f"'{selection}' Is an invalid command \n[use 'help' or 'h' to list options]")
 
 
   def Command_Validate(Input_Command):

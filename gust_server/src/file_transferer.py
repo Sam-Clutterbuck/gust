@@ -3,37 +3,55 @@ import gust_server.src.client_removal_check
 from os.path import getsize
 from time import sleep
 
-from gust_core.src import  Yaml_Editor, Commands_Global, Encrypt_Pki, Integrity_Check
+from gust_core.src import  Yaml_Editor, Commands_Global, Integrity_Check, AES_Encrypt
 from gust_server.src.server_config_link import Server_Global
 
 class File_Transfer:
     
-    def Transfer_Files(Source_Name, Source_Breakdown_File, Connection):
+    def Transfer_Files(Source_Name, Source_Breakdown_File, Client, Session_Info, Session_User):
         
-        Connection.send(Source_Name.encode())
+        
+        outcome = Client.recv(1024).decode()
+        if (outcome != Commands_Global.COMMANDS["success"]["command"]):
+            return False
 
-        response = Connection.recv(1024).decode()
-        if (response != Commands_Global.COMMANDS["ready check"]["command"]):
-            return 
+        ## source valid to transfer
 
-        success = File_Transfer.Send_File(Source_Breakdown_File["hash_file"], Connection)
+        success = File_Transfer.Send_File(Source_Breakdown_File["hash_file"], Client)
         if (success == False):
             return
 
-        response = Connection.recv(1024).decode()
+
+        '''
+        #send name of file to ensure its in their list
+        encrypted_source_name = AES_Encrypt.Session_Encrypt(Session_Info[Session_User]['session'], Session_User,Source_Name)
+        Client.send(encrypted_source_name)
+
+
+
+        response = Client.recv(1024).decode()
+        if (response != Commands_Global.COMMANDS["ready check"]["command"]):
+            return 
+
+        success = File_Transfer.Send_File(Source_Breakdown_File["hash_file"], Client)
+        if (success == False):
+            return
+
+        response = Client.recv(1024).decode()
         if (response != Commands_Global.COMMANDS["ready check"]["command"]):
             return 
 
 
-        success = File_Transfer.Send_File(Source_Breakdown_File["file"], Connection)
+        success = File_Transfer.Send_File(Source_Breakdown_File["file"], Client)
         if (success == False):
             return
         
-        response = Connection.recv(1024).decode()
+        response = Client.recv(1024).decode()
         if (response != Commands_Global.COMMANDS["ready check"]["command"]):
             return 
+        '''
         
-
+'''
     def Send_File(File, Connection):
 
         is_file = Integrity_Check.File_Check(Server_Global.DOWNLOAD_LOC+File)
@@ -58,3 +76,4 @@ class File_Transfer:
         Connection.send(Commands_Global.COMMANDS["end transfer"]["command"].encode())
 
         return True
+        '''

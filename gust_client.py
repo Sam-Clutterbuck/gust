@@ -1,3 +1,3 @@
-from gust_client.src import Gust_Client 
+from gust_client.src import Gust_Client_Cli 
 
-Gust_Client.Start_Client(True)
+Gust_Client_Cli.Cli_Startup()

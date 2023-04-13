@@ -26,12 +26,16 @@ class Yaml_Editor:
                 yaml.dump(Yaml_Content, writer)
                 return True
             except yaml.YAMLError as error:
-                Gust_Log.System_Log(500,error, None, None)
+                Gust_Log.File_Log(500,error, None, None)
                 return False
 
     def Yaml_Dump(Yaml_Content):
         dump = yaml.safe_dump(Yaml_Content)
         return dump
+    
+    def Yaml_Load(Non_Yaml_Content):
+        yaml_content = yaml.safe_load(Non_Yaml_Content)
+        return yaml_content
 
     def List_Headers(File):
 

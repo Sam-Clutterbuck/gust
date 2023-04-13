@@ -8,3 +8,4 @@ target port : 11811
 #storage locations
 client_sources_loc : gust_client/data/pulled_store.yaml
 download_loc : gust_client/data/downloads/
+cli commands : gust_client/data/gust_cli_commands.yaml
