@@ -19,7 +19,7 @@ RUN pip install -r ./$TYPE/requirements.txt
 RUN pip install -r ./gust_core/requirements.txt
 
 # if server move the services python file to root app to be usable
-RUN if [[ "$TYPE" == "gust_server" ]]; then cp /app/$GUST_FILE/services/services.py /app/services.py; fi
+RUN if [[ "$TYPE" == "gust_server" ]]; then cp /app/$GUST_FILE/services/gust_service.py /app/gust_service.py; cp /app/$GUST_FILE/services/gust_web_service.py /app/gust_web_service.py; fi
 
 # Expose gust port and web gui port
 EXPOSE 80
