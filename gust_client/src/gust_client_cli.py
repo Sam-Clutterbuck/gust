@@ -26,7 +26,6 @@ class Gust_Client_Cli:
         CLI_COMMANDS = {}
     
     AUTHENTICATED = False
-    #AUTHENTICATED_USER = None
 
 ##################################################################
 # Core Cli Code
@@ -129,6 +128,14 @@ class Gust_Client_Cli:
         Gust_Client_Cli.AUTHENTICATED = True
         print(f"{Gust_Client.AUTHENTICATED_USER['username']} authenticated")
 
+    def Quit_Cli():
+        
+        if Gust_Client.AUTHENTICATED_USER is not None:
+            Gust_Client.Send_Quit_Notif()
+
+        quit()
+
+
     ###########################
     # Authenticated Commands
 
@@ -164,7 +171,7 @@ class Gust_Client_Cli:
         print(f"{inputs[0]} transfered successfully")
 
     CLI_COMMANDS['commands']['connect'].update({'func':Connect})
-    CLI_COMMANDS['commands']['quit'].update({'func':quit})
+    CLI_COMMANDS['commands']['quit'].update({'func':Quit_Cli})
     CLI_COMMANDS['commands']['help'].update({'func':Print_Help})
     CLI_COMMANDS['commands']['print_sources'].update({'func':Print_Sources})
     CLI_COMMANDS['commands']['update_sources'].update({'func':Update_Sources})

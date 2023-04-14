@@ -44,31 +44,19 @@ Both processes will be demonstrated in the 4 main commands listed below:
 This command adds a new source to the source list. It should be noted that if an already existing source with the same name exists it will be overwritten.
 #### via web gui
 //add photo steps
-#### via command line
-```
-gust-server Add_Source(source_name, source_url, hash_url, hash_type)
-```
+
 ### update source
 This command takes an existing source from the source list and allows the user to update its content. 
 #### via web gui
-#### via command line
-```
-gust-server Update_Source(source_name, source_url, hash_url, hash_type)
-```
+
 ### delete source
 This command takes the selected source and deletes it from the source list. 
 #### via web gui
-#### via command line
-```
-gust-server Delete_Source(source_name)
-```
+
 ### download sources
 The download sources command runs through all of the sources in the list downloading the hash file and then the associated import file before running an integrity hash check on the pair. If they match then the files are stored in the `/server/data/downloads` folder, otherwise they are removed.
 #### via web gui
-#### via command line
-```
-download
-```
+
 
 # Server Cli Service
 If you want to interact with the gust server you can either use the cli interface or web gui. If you choose to use the cli run the command:

@@ -1,11 +1,13 @@
 import gust_server.src.client_removal_check 
 
+import secrets
+
 from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
+from datetime import datetime
 
 from gust_core.src import Yaml_Editor, Commands_Global, Gust_Log, AES_Encrypt, Integrity_Check
 from gust_server.src.file_transferer import File_Transfer
-from gust_server.src.gust_sources import Gust_Sources
 from gust_server.src.login_systems import Login_Auth
 from gust_server.src.server_config_link import Server_Global
 
@@ -141,7 +143,39 @@ class Gust_Server:
         return client_source_list
 
 
+    def Session_Checks():
+        
+        pop_clients = []
 
+        for session in Gust_Server.CONCURRENT_SESSIONS:
+            # close any expires sessions
+
+            session_date = Gust_Server.CONCURRENT_SESSIONS[session]['session_time'][:-4]
+            current_date = datetime.now().strftime("%d%m%Y") 
+
+            session_time = Gust_Server.CONCURRENT_SESSIONS[session]['session_time'][-4:]
+            current_time = datetime.now().strftime("%H%M") 
+
+            #ensure the session was for today
+            if (current_date != session_date):
+                pop_clients.append(session)
+
+            hours = int(session_time[:-2]) * 60
+            session_minutes = hours + int(session_time[-2:])
+
+            hours = int(current_time[:-2]) * 60
+            current_minutes = hours + int(current_time[-2:])
+
+            time_diff = current_minutes - session_minutes
+
+            print(time_diff)
+
+            if (time_diff >= Server_Global.SESSION_LIMIT):
+                pop_clients.append(session)
+
+
+        for client in pop_clients:
+            Gust_Server.CONCURRENT_SESSIONS.pop(client)
 
 
 
@@ -161,9 +195,20 @@ class Gust_Server:
         
         ## Authenticated User
         
+        Gust_Server.Session_Checks()
+
+        if (len(Gust_Server.CONCURRENT_SESSIONS) >= Server_Global.MAX_CONCURRENT_USERS):
+            Client.send(Commands_Global.COMMANDS["failure"]["command"].encode())
+            Gust_Server.Send_Response("Max number of sessions exceeded" , Client)
+            return
+
+
         Gust_Log.Authentication_Log(200, f"Authenticated user {Login_Auth.Username_Grab(decrypted_login)}", Client, Login_Auth.Username_Grab(decrypted_login))
-        session = '123456789'
-        Gust_Server.CONCURRENT_SESSIONS.update({decrypted_login:{'username':Login_Auth.Username_Grab(decrypted_login), 'session':session}}) 
+        session = secrets.token_hex(32)
+        session_time = datetime.now().strftime("%d%m%Y%H%M") 
+
+        Gust_Server.CONCURRENT_SESSIONS.update({decrypted_login:{'username':Login_Auth.Username_Grab(decrypted_login), 'session':session, 'session_time':session_time}}) 
+        print(Gust_Server.CONCURRENT_SESSIONS)
 
         ## Inform client and send session data
         Client.send(Commands_Global.COMMANDS["success"]["command"].encode())
@@ -178,11 +223,14 @@ class Gust_Server:
     @Client_Recieve
     def Session_Open(Client, Request):
 
+        Gust_Server.Session_Checks()
+
         # recieve session request
         successful, decrypted_user = Gust_Server.AES_Session_Checks(Request, Client)
         if not successful:
             Client.send(Commands_Global.COMMANDS["failure"]["command"].encode())
             return
+
 
         # Success response
 
@@ -283,13 +331,22 @@ class Gust_Server:
 
         return
 
+    @Client_Recieve
+    def Quit_Notif(Client, Request):
 
+        if Request.decode() not in Gust_Server.CONCURRENT_SESSIONS:
+            return
+
+        Gust_Server.CONCURRENT_SESSIONS.pop(Request.decode())
+
+        return
     
 
     Commands_Global.COMMANDS["authenticate"].update({"func":Authenticate_User})
     Commands_Global.COMMANDS["session"].update({"func":Session_Open})
     Commands_Global.COMMANDS["update sources"].update({"func":Transfer_Source_List})
     Commands_Global.COMMANDS["transfer files"].update({"func":Transfer_File})
+    Commands_Global.COMMANDS["quit"].update({"func":Quit_Notif})
 
 
 

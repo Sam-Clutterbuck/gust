@@ -2,7 +2,6 @@
 # Client / Reciever Options 
 ######################################
 #Default setup as loopback address
-target ip : '127.0.0.1'
 target port : 11811
 
 #storage locations

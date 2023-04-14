@@ -5,11 +5,11 @@
 ip : '127.0.0.1'
 port : 11811
 
-#set how many login attempts before disconnected
-connection attempt limit: 3
-
 #max number of users at one time
 max concurrent users: 2
+
+#session time limit (in mins)
+session limit: 30
 
 #storage locations
 server_sources_loc : gust_server/data/gust_store.yaml

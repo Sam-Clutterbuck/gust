@@ -186,11 +186,25 @@ class Gust_Server_Cli:
   @Confirm_Authenticated
   def Delete_Source():
     print("Deleting Source")
-    inputs = Gust_Server_Cli.Input_Cycle("delete_source")
-    if inputs is None:
-      return
-    Gust_Sources.Delete_Source(inputs[0])
-    Gust_Server_Cli.Print_Sources()
+
+    valid_source = False
+    while not valid_source:
+
+      inputs = Gust_Server_Cli.Input_Cycle("delete_source")
+      if inputs is None:
+        return
+
+      source_list = Gust_Sources.List_Sources()
+
+      if inputs[0] in source_list:
+        valid_source = True
+        break
+
+      print("enter a valid source")
+
+    if valid_source:
+      Gust_Sources.Delete_Source(inputs[0])
+      Gust_Server_Cli.Print_Sources()
 
   @Confirm_Authenticated
   def Download_All():

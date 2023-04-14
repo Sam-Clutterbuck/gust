@@ -6,7 +6,7 @@ logging.basicConfig(
     level=logging.INFO,
     format="{asctime} {levelname:<8} {message}",
     style='{',
-    filename='gust_core/data/logs/test.log',
+    filename='gust_core/data/logs/gust.log',
     filemode='a'
 )
 

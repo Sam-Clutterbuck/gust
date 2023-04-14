@@ -217,6 +217,8 @@ class Gust_Client:
         recieved_content = Gust_Client.Decrypt_Session(Socket, file_bytes[:-6])
         if recieved_content is None:
             Socket.send(Commands_Global.COMMANDS["failure"]["command"].encode())
+            file.close()
+            
             return False, None
         
         file.write(recieved_content)
@@ -289,7 +291,14 @@ class Gust_Client:
         Gust_Client.Close_Socket(Socket)
         return True
 
+    @Run_Client
+    def Send_Quit_Notif(Socket):
 
+        Socket.send(Commands_Global.COMMANDS["quit"]["command"].encode())
+
+        Gust_Client.Send_Request(Socket, Gust_Client.AUTHENTICATED_USER['login'])
+
+        return
 
 
     @Run_Client

@@ -7,7 +7,10 @@ class Client_Global:
     if (success == False):
         config_file = {}
 
-    TARGET_IP = config_file["target ip"]
+
+    target = open('gust_client/data/target_ip','r')
+    
+    TARGET_IP = target.readline()  
     TARGET_PORT = config_file["target port"]
     SOURCE_LOC = config_file["client_sources_loc"]
     DOWNLOAD_LOC = config_file["download_loc"]
