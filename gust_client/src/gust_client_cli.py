@@ -142,8 +142,14 @@ class Gust_Client_Cli:
 
     @Confirm_Authenticated
     def Transfer_All():
-        Gust_Client.Transfer_All()
         print("Setting up Source Transfer")
+
+        for source in Yaml_Editor.List_Headers(Client_Global.SOURCE_LOC):
+            if not Gust_Client.Transfer_Source(source):
+                print(f"Failed to transfer {source}")
+            else:
+                print(f"{source} transfered successfully")
+
 
     @Confirm_Authenticated
     def Transfer_Source():
@@ -152,7 +158,10 @@ class Gust_Client_Cli:
         if inputs is None:
             return
         print(f"Requesting transfer of {inputs[0]} from server to client")
-        Gust_Client.Transfer_Source(inputs[0])
+        if not Gust_Client.Transfer_Source(inputs[0]):
+            print(f"Failed to transfer {inputs[0]}")
+            return
+        print(f"{inputs[0]} transfered successfully")
 
     CLI_COMMANDS['commands']['connect'].update({'func':Connect})
     CLI_COMMANDS['commands']['quit'].update({'func':quit})

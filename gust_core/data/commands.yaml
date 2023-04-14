@@ -4,8 +4,6 @@ session:
   command: "![SESSION_OPEN]"
 update sources: 
   command: "![UPDATE_SOURCES]"
-transfer all: 
-  command: "![TRANSFER_ALL]"
 transfer files: 
   command: "![TRANSFER]"
 success:

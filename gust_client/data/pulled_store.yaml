@@ -1,12 +1,12 @@
 demo:
-  avaliable: false
+  avaliable: 'False'
   hash_type: sha256
   last downloaded: Wed 12 Apr 2023 - 18:22
 demo3:
-  avaliable: false
+  avaliable: 'False'
   hash_type: sha256
   last downloaded: Wed 12 Apr 2023 - 18:22
 lorem:
-  avaliable: true
+  avaliable: 'True'
   hash_type: sha256
   last downloaded: Thu 13 Apr 2023 - 21:12

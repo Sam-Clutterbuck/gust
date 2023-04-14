@@ -152,6 +152,7 @@ class Gust_Server:
     @Client_Recieve
     def Authenticate_User(Client, Request):
 
+        # recieve auth request
         successful, decrypted_login = Gust_Server.AES_Login_Checks(Request, Client)
         if not successful:
             Client.send(Commands_Global.COMMANDS["failure"]["command"].encode())
@@ -164,7 +165,7 @@ class Gust_Server:
         session = '123456789'
         Gust_Server.CONCURRENT_SESSIONS.update({decrypted_login:{'username':Login_Auth.Username_Grab(decrypted_login), 'session':session}}) 
 
-        ## Inform client
+        ## Inform client and send session data
         Client.send(Commands_Global.COMMANDS["success"]["command"].encode())
         session_data = Yaml_Editor.Yaml_Dump(Gust_Server.CONCURRENT_SESSIONS[decrypted_login])
         encrypted_session_data = AES_Encrypt.Login_Encrypt(decrypted_login, f"{Client.getpeername()[0]}:{Client.getpeername()[1]}", session_data)
@@ -177,6 +178,7 @@ class Gust_Server:
     @Client_Recieve
     def Session_Open(Client, Request):
 
+        # recieve session request
         successful, decrypted_user = Gust_Server.AES_Session_Checks(Request, Client)
         if not successful:
             Client.send(Commands_Global.COMMANDS["failure"]["command"].encode())
@@ -186,6 +188,7 @@ class Gust_Server:
 
         Client.send(Commands_Global.COMMANDS["success"]["command"].encode())
 
+        # recieve further function request for this session
         request = Client.recv(1024).decode()
 
         for command in Commands_Global.COMMANDS:
@@ -199,6 +202,8 @@ class Gust_Server:
     @Client_Recieve
     def Transfer_Source_List(Client, Request, Session_User):
         
+        # recieve source list request
+
         if Session_User is None:
             Gust_Log.Authentication_Log(403, f"Request With unknown Session recieved", Client, None)
             Client.send(Commands_Global.COMMANDS["failure"]["command"].encode())
@@ -218,6 +223,7 @@ class Gust_Server:
             return False
         
         # Success response
+        #send source list
 
         source_list = Gust_Server.Prep_Source_List()
         encrypted_source_list = AES_Encrypt.Session_Encrypt(Gust_Server.CONCURRENT_SESSIONS[Session_User]['session'], Session_User, Yaml_Editor.Yaml_Dump(source_list))
@@ -235,6 +241,7 @@ class Gust_Server:
     @Client_Recieve
     def Transfer_File(Client, Request, Session_User):
 
+        # recieve transfer request
         if Session_User is None:
             Gust_Log.Authentication_Log(403, f"Request With unknown Session recieved", Client, None)
             return
@@ -245,7 +252,26 @@ class Gust_Server:
             Gust_Server.Send_Response("Request With Invalid Session recieved" , Client)
             return False
 
+        #check source is avaliable to download
+        downloaded_source = False
+        for header in Yaml_Editor.List_Headers(Server_Global.DOWNLOAD_LOG_LOC):
+            if (decrypted_source == header):
+                downloaded_source = True
+
+        if not downloaded_source:
+            Client.send(Commands_Global.COMMANDS["failure"]["command"].encode())
+            Gust_Server.Send_Response("attempted to transfer a file that hasn't been downloaded" , Client)
+            return False
+        
+        # check that the file is downloaded even if its logged
+        downloaded_file = Integrity_Check.File_Check(Server_Global.DOWNLOAD_LOC+Yaml_Editor.Breakdown_Dictionary(decrypted_source,Server_Global.DOWNLOAD_LOG_LOC)['hash_file'])
+        if not downloaded_file:
+            Client.send(Commands_Global.COMMANDS["failure"]["command"].encode())
+            Gust_Server.Send_Response("attempted to transfer a file that hasn't been downloaded" , Client)
+            return False
+        
         # Success response
+        # send source being transfered for confirmation
 
         Client.send(Commands_Global.COMMANDS["success"]["command"].encode())
 
@@ -253,36 +279,9 @@ class Gust_Server:
         Gust_Server.Send_Response(encrypted_source_name , Client)
 
 
-        File_Transfer.Transfer_Files(decrypted_source, Gust_Sources.Break_Source(decrypted_source), Client, Gust_Server.CONCURRENT_SESSIONS, Session_User)
+        File_Transfer.Transfer_Files(decrypted_source, Yaml_Editor.Breakdown_Dictionary(decrypted_source, Server_Global.DOWNLOAD_LOG_LOC), Client, Gust_Server.CONCURRENT_SESSIONS, Session_User)
 
-        
-
-        print("TRANSFER FILE")
-        print(decrypted_source)
-        print(Session_User)
         return
-
-
-
-
-    @Client_Recieve
-    def Transfer_All_Files(Client, Request, Session_User):
-        
-        if Session_User is None:
-            Gust_Log.Authentication_Log(403, f"Request With unknown Session recieved", Client, None)
-            return
-        
-        success, decrypted_message = AES_Encrypt.Session_Decrypt(Gust_Server.CONCURRENT_SESSIONS[Session_User]['session'], Session_User , Request)
-        if not success:
-            Client.send(Commands_Global.COMMANDS["failure"]["command"].encode())
-            Gust_Server.Send_Response("Request With Invalid Session recieved" , Client)
-            return False
-
-        print("TRANSFER ALL")
-        
-        print(Session_User)
-        return
-    
 
 
     
@@ -290,7 +289,6 @@ class Gust_Server:
     Commands_Global.COMMANDS["authenticate"].update({"func":Authenticate_User})
     Commands_Global.COMMANDS["session"].update({"func":Session_Open})
     Commands_Global.COMMANDS["update sources"].update({"func":Transfer_Source_List})
-    Commands_Global.COMMANDS["transfer all"].update({"func":Transfer_All_Files})
     Commands_Global.COMMANDS["transfer files"].update({"func":Transfer_File})
 
 
@@ -300,248 +298,3 @@ class Gust_Server:
 
 
 
-
-
-
-
-
-'''
-class Server_Commands:
-
-
-    def Translate_Command(Command, Client):
-        for option in Commands_Global.COMMANDS:
-            if (Commands_Global.COMMANDS[option]["command"] == Command.upper()):
-        
-                if (Commands_Global.COMMANDS[option]["func"] == "None"):
-                    return
-                
-                Commands_Global.COMMANDS[option]["func"](Client)
-
-    def Update_Sources(Client):
-        success, yaml_file = Yaml_Editor.Yaml_Read(Server_Global.SOURCE_LOC)
-        if (success == False):
-            return None
-        
-        source_yaml = {}
-        
-        for source in yaml_file:
-        
-            pairs = {source: {"hash_type": yaml_file[source]['hash_type']}}
-            source_yaml.update(pairs)
-
-        encrypted_source = Encrypt_Pki.Encrypt_Message(Yaml_Editor.Yaml_Dump(source_yaml), Client)
-        Client.sendall(encrypted_source)
-        Client.send(Commands_Global.COMMANDS["end transfer"]["command"].encode())
-        
-    def Download(Client):
-        Gust_Sources.Download_Sources()
-        Client.send(Commands_Global.COMMANDS["ready check"]["command"].encode())
-
-    def Transfer(Client):
-
-        source_list = Yaml_Editor.List_Headers(Server_Global.DOWNLOAD_LOG_LOC)
-               
-        for source in source_list:
-            breakdown = Yaml_Editor.Breakdown_Dictionary(source, Server_Global.DOWNLOAD_LOG_LOC)
-            
-            File_Transfer.Transfer_Files(source, breakdown, Client)
-
-    def Quit(Client):
-        Gust_Server.Gracefull_Close(Client)
-
-    Commands_Global.COMMANDS["update sources"].update({"func":Update_Sources})
-    Commands_Global.COMMANDS["download files"].update({"func":Download})
-    Commands_Global.COMMANDS["transfer files"].update({"func":Transfer})
-    Commands_Global.COMMANDS["quit"].update({"func":Quit})
-    
-
-class Gust_Server:
-    
-    #####################
-    #Globals
-
-    CONCURRENT_CONNECTIONS = {}
-
-    SERVERSOCKET = socket(AF_INET, SOCK_STREAM)
-    #####################
-
-    def Connection_Check(Client):
-        if Client is None or (Client._closed == True):
-            Gust_Log.System_Log(500,"No active connection",None, None)
-            quit()
-
-    def Start_Server():
-        
-        try:
-            Gust_Server.SERVERSOCKET.bind((Server_Global.HOST_IP, Server_Global.HOST_PORT))
-        except socket.error as error:
-            Gust_Log.System_Log(500,str(error),None, None)
-
-        print('Socket is listening..')
-        Gust_Server.SERVERSOCKET.listen(5)
-        Encrypt_Pki.Create_Keys()
-
-        #Set up seperate thread for each connecting client
-        while True:
-            client, addr = Gust_Server.SERVERSOCKET.accept()
-            print('Connection attempt by: ' + addr[0] + ':' + str(addr[1]))
-            new_thread = Thread(target=Gust_Server.Server_Steps, args=(client, ))
-            new_thread.start()
-        SERVERSOCKET.close()
-
-
-    def Server_Steps(Client):
-        
-        print(Client.getsockname())
-        print(Client.getpeername())
-        Gust_Server.Connection_Check(Client)
-
-        authorised = False
-        
-        #login authorisation checks
-        while not authorised:
-            try:
-
-                ##handle for disconnect
-                Gust_Server.Connection_Check(Client)
-
-                success = Gust_Server.Attempt_Login(Client)
-                if (success == True):
-                    authorised = True
-
-            except OSError as error:
-                if (Client._closed == False):
-                    Gust_Log.System_Log(500,str(error),Client, None)
-                return
-            
-
-        #authorised tasks once logged in
-        while authorised:
-            try:
-
-                ##handle for disconnect
-                Gust_Server.Connection_Check(Client)
-
-                Gust_Server.Recieve_Commands(Client)
-
-            except OSError as error:
-                if (Client._closed == False):
-                    Gust_Log.System_Log(500,str(error),Client, Gust_Server.CONCURRENT_CONNECTIONS[Client])
-                return 
-        
-        Gust_Server.Gracefull_Close(Client)
-
-    def AES_Login_Checks(Message):
-        
-        login_list = Login_Auth.List_Logins()
-
-        for login in login_list:
-            success, decrypted_message = Encrypt_Pki.AES_Decrypt(login, Message)
-            if success:
-                return True, decrypted_message
-        
-        return False, None
-
-    def Attempt_Login(Client):
-
-        successful_login = False
-        login_attempts = 0
-
-        while not successful_login:
-            login_details = Client.recv(1024)
-
-
-
-            success, username, decrypted_login = Gust_Server.Login_Authorisation(login_details)
-                    
-            if (success == False):
-                login_attempts +=1
-
-                if (login_attempts >= Server_Global.LOGIN_ATTEMPT_LIMIT):
-                    Gust_Log.Authentication_Log(403, "Excessive Failed login attempts for :" + username, Client, username)
-                    Client.send(("Excessive Failed login - Disconnected from server"+Commands_Global.COMMANDS["disconnect"]["command"]).encode())
-                    Client.send("Safe to close".encode())
-                    Client.close()
-
-                Gust_Log.Authentication_Log(401, "Incorrect login details for :" + username, Client, username)
-                Client.send("Incorrect login details".encode())
-            
-            else:
-                
-                if (len(Gust_Server.CONCURRENT_CONNECTIONS) >= Server_Global.MAX_CONCURRENT_USERS):
-                    
-                    print("SENT")
-                    Client.send(("Max concurrent users reached - please wait and try again later"+Commands_Global.COMMANDS["disconnect"]["command"]).encode())
-                    Client.close()
-                    quit()
-
-                Gust_Log.Authentication_Log(200, username + " Logged into server", Client, username)
-                Client.send((Commands_Global.COMMANDS["authorised"]["command"]).encode())
-
-                Gust_Server.CONCURRENT_CONNECTIONS.update({Client:username})
-
-                Gust_Server.Send_Public_Key(Client, decrypted_login)
-
-                successful_login = True
-            
-        return successful_login
-
-
-    def Login_Authorisation(Login_Details):
-
-        if Login_Details is None:
-            return False, "No Username Entered", None
-
-        Decrypted, decrypted_login = Gust_Server.AES_Login_Checks(Login_Details)
-
-        if Decrypted:
-            success, username = Login_Auth.Login_Check(decrypted_login)
-
-            return success, username, decrypted_login
-
-        return False, "Error Occured", None
-    
-    def Send_Public_Key(Client, Login_Details):
-
-        authenticated= False
-        auth_attempts = 0
-
-        while not authenticated:
-        
-            encrypted_public_key = Encrypt_Pki.Prep_Public_Key(Login_Details)
-            Client.send(encrypted_public_key)
-
-            confirmation = Client.recv(1024)
-            Encrypt_Pki.Decrypt_Public_Key(confirmation, Login_Details, Client)
-
-            encrypted_message = Encrypt_Pki.Encrypt_Message(Commands_Global.COMMANDS["authorised"]["command"], Client)
-            Client.send(encrypted_message)
-
-            confirmation = Client.recv(1024)
-            decrypted_confirmation = Encrypt_Pki.Decrypt_Message(confirmation)
-
-            if (decrypted_confirmation == Commands_Global.COMMANDS["authorised"]["command"]):
-                Gust_Log.Authentication_Log(200, "Public key passed to client successfully", Client, Gust_Server.CONCURRENT_CONNECTIONS[Client])
-                authenticated = True
-                return 
-            
-            if (auth_attempts >= Server_Global.LOGIN_ATTEMPT_LIMIT):
-                Gust_Log.Authentication_Log(403, "Excessive Failed Public Key authoriusation attempts ", Client, Gust_Server.CONCURRENT_CONNECTIONS[Client])
-                Client.send(("Excessive Failed Public Key authorisation attempts - Disconnected from server"+Commands_Global.COMMANDS["disconnect"]["command"]).encode())
-                Gust_Server.Gracefull_Close(Client)
-
-            Gust_Log.Authentication_Log(401, "Incorrect public keys", Client, Gust_Server.CONCURRENT_CONNECTIONS[Client])
-                
-    def Recieve_Commands(Client):
-
-        recieved_command = Encrypt_Pki.Decrypt_Message(Client.recv(1024))
-        Server_Commands.Translate_Command(recieved_command, Client)
-        
-    def Gracefull_Close(Client):
-        Gust_Server.CONCURRENT_CONNECTIONS.pop(Client)
-
-        Client.send("Safe to disconnect".encode())
-        Client.close()
-        quit()
-    '''
