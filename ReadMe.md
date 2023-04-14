@@ -5,6 +5,12 @@ Gust is a Air gapped network import solution comprised of 2 different components
 
 Gust is best used for repeatable import sources such as plugin repositories, update and patch files, and other downloads that all accessible from a static url.
 
+## Docker
+
+Download the docker images for gust to quikly deploy or test here:
+* https://hub.docker.com/r/samclutterbuck/gust_client
+* https://hub.docker.com/r/samclutterbuck/gust_server
+
 ## Server
 
 Due to its access to the internet the server is locked down and is able to download the import files and store them locally however only has write and read access and no executable access outside of its own core python functions. It is also only allowed to access the urls of selected import files and hashes.
@@ -21,3 +27,7 @@ sha256
 The Client also has to be securely locked down to ensure that its connection to an internet connected device (the  server) doesn't compromise its integrity and confidentiality. To assist in this the client can only connect to the servers specific gust port `11811` and doesn't have access to any http(s) ports or web interfaces. On top of this the client only able to accept files and have write access to files from the server transfer and not any other locations on the interior network.
 
 [Find out more about how to use the client in the docs...](/docs/client.md)
+
+## Release Notes
+To find out information on the latest releases check the release notes page in the docs folder
+
