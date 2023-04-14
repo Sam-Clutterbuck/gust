@@ -6,6 +6,7 @@ FROM python:3-alpine3.15
 #   docker build -t samclutterbuck/<gust_server | gust_client>:<version> . --build-arg TYPE=<gust_server | gust_client>
 ARG TYPE=gust_client
 ENV GUST_FILE=$TYPE
+ENV GUST_IP='127.0.0.1'
 
 # set up file structire
 WORKDIR /app
@@ -25,5 +26,7 @@ RUN if [[ "$TYPE" == "gust_server" ]]; then cp /app/$GUST_FILE/services/gust_ser
 EXPOSE 80
 EXPOSE 11811
 
-# Start the default opening scripts and loop for access
-CMD if [[ "$GUST_FILE" == "gust_server" ]]; then /app/$GUST_FILE/services/gust_service.service; /app/$GUST_FILE/services/gust_web_service.service;  fi; tail -f /dev/null
+# if a server set host ip as server host ip (otherwise use passed ENV var)
+# Start the default opening services if server 
+# run infinite loop for access
+CMD if [[ "$GUST_FILE" == "gust_server" ]]; then GUST_IP=$(hostname -i); fi; echo $GUST_IP > /app/gust_core/data/gust_ip; if [[ "$GUST_FILE" == "gust_server" ]]; then /app/$GUST_FILE/services/gust_service.service; /app/$GUST_FILE/services/gust_web_service.service;  fi; tail -f /dev/null

@@ -168,8 +168,6 @@ class Gust_Server:
 
             time_diff = current_minutes - session_minutes
 
-            print(time_diff)
-
             if (time_diff >= Server_Global.SESSION_LIMIT):
                 pop_clients.append(session)
 
@@ -197,7 +195,7 @@ class Gust_Server:
         
         Gust_Server.Session_Checks()
 
-        if (len(Gust_Server.CONCURRENT_SESSIONS) >= Server_Global.MAX_CONCURRENT_USERS):
+        if (len(Gust_Server.CONCURRENT_SESSIONS) >= Server_Global.MAX_CONCURRENT_USERS) and decrypted_login not in Gust_Server.CONCURRENT_SESSIONS:
             Client.send(Commands_Global.COMMANDS["failure"]["command"].encode())
             Gust_Server.Send_Response("Max number of sessions exceeded" , Client)
             return
@@ -208,7 +206,6 @@ class Gust_Server:
         session_time = datetime.now().strftime("%d%m%Y%H%M") 
 
         Gust_Server.CONCURRENT_SESSIONS.update({decrypted_login:{'username':Login_Auth.Username_Grab(decrypted_login), 'session':session, 'session_time':session_time}}) 
-        print(Gust_Server.CONCURRENT_SESSIONS)
 
         ## Inform client and send session data
         Client.send(Commands_Global.COMMANDS["success"]["command"].encode())
