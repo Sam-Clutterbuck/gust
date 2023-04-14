@@ -1,3 +1,4 @@
 import gust_client.src.server_removal_check
-from gust_client.src.gust_client import Gust_Client
+from gust_client.src.gust_client_source import Gust_Client
 from gust_client.src.client_config_link import Client_Global
+from gust_client.src.gust_client_cli import Gust_Client_Cli

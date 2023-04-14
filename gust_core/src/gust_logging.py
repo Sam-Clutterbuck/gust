@@ -6,7 +6,7 @@ logging.basicConfig(
     level=logging.INFO,
     format="{asctime} {levelname:<8} {message}",
     style='{',
-    filename='gust_core/data/logs/test.log',
+    filename='gust_core/data/logs/gust.log',
     filemode='a'
 )
 
@@ -21,7 +21,7 @@ class Gust_Log:
         else: 
             connection_details = str(Connection.getpeername())
 
-        if User is None:
+        if User is None or type(User) is not str:
             User = "Unknown User"
 
         formated_mesage =  "[ " + connection_details +  " ] [ "+ User +" ] : " + Message
@@ -53,6 +53,9 @@ class Gust_Log:
         match Code:
             case 404:   #file not found
                 logging.error(formated_mesage)
+
+            case 500:
+                logging.warning(formated_mesage)
 
             case _:
                 logging.error(formated_mesage)

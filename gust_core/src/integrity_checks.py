@@ -36,21 +36,25 @@ class Integrity_Check:
     def Hash_Check(Source_File, Hash_File, Hash_Type):
         
         success, source_data = Integrity_Check.Read_File(Source_File)
+        if not success:
+            return False
         success, hash_data = Integrity_Check.Read_File(Hash_File)
+        if not success:
+            return False
 
         if (source_data is None) or (hash_data is None):
             return False
 
-        match Hash_Type.lower():
-            case "md5":
+        match Hash_Type.upper():
+            case "MD5":
                 # deepcode ignore InsecureHash: <MD5 is not the most secure however is still a commercial standard hash check>
                 hash_check = hashlib.md5()
 
-            case "sha256":
+            case "SHA256":
                 hash_check = hashlib.sha256()
 
             case _:
-                hash_check = hashlib.md5()
+                hash_check = hashlib.sha256()
 
 
         hash_check.update(source_data)

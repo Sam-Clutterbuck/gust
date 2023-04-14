@@ -7,10 +7,14 @@ class Server_Global:
     if (success == False):
         config_file = {}
 
-    HOST_IP = config_file["ip"]
+    target = open('gust_core/data/gust_ip','r')
+    
+    HOST_IP = target.readline().strip()
+
     HOST_PORT = config_file["port"]
     LOGIN_ATTEMPT_LIMIT = config_file["connection attempt limit"]
     MAX_CONCURRENT_USERS = config_file["max concurrent users"]
+    SESSION_LIMIT = config_file["session limit"]
     DOWNLOAD_LOG_LOC= config_file["download_log_loc"]
     DOWNLOAD_LOC = config_file["download_loc"]
     SOURCE_LOC = config_file["server_sources_loc"]

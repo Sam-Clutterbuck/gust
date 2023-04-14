@@ -1,27 +1,18 @@
-list options: 
-  command: "![LIST]"
-  func: None
+authenticate: 
+  command: "![AUTHENTICATE]"
+session: 
+  command: "![SESSION_OPEN]"
 update sources: 
   command: "![UPDATE_SOURCES]"
-  func: None
-download files: 
-  command: "![DOWNLOAD]"
-  func: None
 transfer files: 
   command: "![TRANSFER]"
-  func: None
-quit: 
-  command: "![QUIT]"
-  func: None
-authorised:
-  command: "![AUTHORISED]"
-  func: None
-disconnect:
-  command: "![DISCONNECT]"
-  func: None
+success:
+  command: "![SUCCESS]"
+failure:
+  command: "![FAILURE]"
 end transfer:
   command: "![END]"
-  func: None
 ready check:
   command: "![READY]"
-  func: None
+quit:
+  command: "![QUIT]"

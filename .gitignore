@@ -129,5 +129,5 @@ dmypy.json
 .pyre/
 
 ./core/data/logs/*
-./server/data/*
-./client/data/*
+./server/data/downloads/*
+./client/data/downloads/*

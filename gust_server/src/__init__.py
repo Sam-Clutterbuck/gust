@@ -1,5 +1,5 @@
 import gust_server.src.client_removal_check 
-from gust_server.src.gust_server import Server_Commands, Gust_Server
+from gust_server.src.gust_server_source import Gust_Server
 from gust_server.src.gust_sources import Gust_Sources
 from gust_server.src.file_downloader import File_Download
 from gust_server.src.file_transferer import File_Transfer

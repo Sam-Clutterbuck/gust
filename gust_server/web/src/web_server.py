@@ -14,7 +14,7 @@ app.secret_key = "TEST"
 #####################
 
 def Start_Web_App():
-    app.run(host="0.0.0.0", port=80, debug=True)
+    app.run(host="0.0.0.0", port=80)
 
 
 ########################################################################

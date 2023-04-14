@@ -6,7 +6,7 @@ from gust_server.src.server_config_link import Server_Global
 from gust_server.src.account_control import Account_Control
 from gust_server.src.login_systems import Login_Auth
 from gust_server.src.gust_sources import Gust_Sources
-from gust_server.src.gust_server import Gust_Server
+from gust_server.src.gust_server_source import Gust_Server
 from gust_core.src.yaml_editor import Yaml_Editor
 
 
@@ -103,7 +103,7 @@ class Gust_Server_Cli:
       selection = input("\nEnter a command to run: ").lower()
 
       if not Gust_Server_Cli.Command_Validate(selection):
-        print(f"'{selection}' Is an invalid command \n[use 'help' or 'l' to list options]")
+        print(f"'{selection}' Is an invalid command \n[use 'help' or 'h' to list options]")
 
 
   def Command_Validate(Input_Command):
@@ -186,11 +186,25 @@ class Gust_Server_Cli:
   @Confirm_Authenticated
   def Delete_Source():
     print("Deleting Source")
-    inputs = Gust_Server_Cli.Input_Cycle("delete_source")
-    if inputs is None:
-      return
-    Gust_Sources.Delete_Source(inputs[0])
-    Gust_Server_Cli.Print_Sources()
+
+    valid_source = False
+    while not valid_source:
+
+      inputs = Gust_Server_Cli.Input_Cycle("delete_source")
+      if inputs is None:
+        return
+
+      source_list = Gust_Sources.List_Sources()
+
+      if inputs[0] in source_list:
+        valid_source = True
+        break
+
+      print("enter a valid source")
+
+    if valid_source:
+      Gust_Sources.Delete_Source(inputs[0])
+      Gust_Server_Cli.Print_Sources()
 
   @Confirm_Authenticated
   def Download_All():
